@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video 4 · Priya's Monday Morning</title>
+<!-- Fonts: Lilita One (comic display), Outfit (body), Patrick Hand (speech bubbles), JetBrains Mono (code) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Outfit:wght@400;600;800&family=Patrick+Hand&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   THEME TOKENS  (change these to re-skin the whole deck)
+   =========================================== */
+:root{
+  --ink:#0e1230;          /* outlines + dark text */
+  --night:#0a0f35;
+  --cream:#fff2d1;        /* paper + light text */
+  --amber:#ffb703;        /* hero accent */
+  --scarlet:#ef476f;      /* reject / Ron */
+  --teal:#2ec4b6;         /* Priya / parse */
+  --mint:#06d6a0;         /* strong match / score */
+  --sky:#4cc9f0;          /* Harry / audit trail */
+  --coral:#ff7f50;        /* parallel */
+  --stage-bg:#03051a;
+  --slide-bg:#0a0f35;
+  --f-disp:'Lilita One',sans-serif;
+  --f-body:'Outfit',sans-serif;
+  --f-hand:'Patrick Hand',cursive;
+  --f-mono:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --sh:var(--ink);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* ===========================================
+   FIXED 16:9 STAGE: MANDATORY BASE STYLES
+   (slides are authored at 1920x1080 and scaled as a whole)
+   =========================================== */
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--stage-bg,#000)}
+.deck-viewport{position:fixed;inset:0;overflow:hidden;background:var(--stage-bg,#000)}
+.deck-stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;transform-origin:0 0;background:var(--slide-bg,#fff)}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;display:block;visibility:hidden;opacity:0;pointer-events:none;background:var(--slide-bg,#fff)}
+.slide.active,.slide.visible{visibility:visible;opacity:1;pointer-events:auto;z-index:1}
+img,video,canvas,svg{max-width:100%;max-height:100%}
+.deck-controls{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:1000}
+@media print{
+  html,body{width:1920px;height:auto;overflow:visible;background:#fff}
+  .deck-viewport{position:static;overflow:visible;background:#fff}
+  .deck-stage{position:static;width:auto;height:auto;transform:none !important;background:none}
+  .slide{position:relative;display:block !important;visibility:visible !important;opacity:1 !important;pointer-events:auto !important;width:1920px;height:1080px;break-after:page;page-break-after:always}
+  .slide:last-child{break-after:auto;page-break-after:auto}
+  .deck-controls{display:none !important}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.2s !important}
+}
+
+/* ===========================================
+   SLIDE FLAVOURS
+   .night = problem / story scenes   .paper = solution / blueprint scenes
+   =========================================== */
+.slide{font-family:var(--f-body);font-size:34px;color:var(--cream)}
+.night{
+  background:
+    radial-gradient(1100px 650px at 80% 28%,rgba(70,86,200,.55) 0%,transparent 62%),
+    linear-gradient(180deg,#060a2a 0%,#0e1556 62%,#1b2370 100%);
+  --sh:var(--amber);
+}
+/* halftone comic dots */
+.night::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 2.5px,transparent 3px);background-size:28px 28px;pointer-events:none}
+.paper{
+  color:var(--ink);background-color:var(--cream);
+  background-image:linear-gradient(rgba(14,18,48,.07) 2px,transparent 2px),linear-gradient(90deg,rgba(14,18,48,.07) 2px,transparent 2px);
+  background-size:60px 60px;--sh:var(--ink);
+}
+.abs{position:absolute}
+
+/* ===========================================
+   REVEAL ANIMATIONS  (trigger when slide gets .visible)
+   =========================================== */
+.reveal{opacity:0;transform:translateY(46px);transition:opacity .7s var(--ease) var(--d,0s),transform .85s var(--ease) var(--d,0s)}
+.reveal.l{transform:translateX(-130px)}
+.reveal.r{transform:translateX(130px)}
+.reveal.pop{transform:scale(.45) rotate(-8deg);transition-timing-function:cubic-bezier(.34,1.56,.64,1)}
+.slide.visible .reveal{opacity:1;transform:none}
+
+/* ===========================================
+   TYPE
+   =========================================== */
+.disp{font-family:var(--f-disp);font-weight:400;letter-spacing:.5px}
+.h1{font-family:var(--f-disp);font-size:196px;line-height:.9;color:var(--cream);text-shadow:9px 9px 0 rgba(0,0,0,.45)}
+.h2{font-family:var(--f-disp);font-size:92px;line-height:1.02;text-shadow:6px 6px 0 rgba(0,0,0,.35)}
+.paper .h2{text-shadow:5px 5px 0 rgba(255,183,3,.7)}
+.over{font-family:var(--f-disp);font-size:34px;letter-spacing:4px;color:var(--amber);text-transform:uppercase}
+.paper .over{color:#c46a00}
+.lead{font-size:42px;line-height:1.3;font-weight:600}
+.hand{font-family:var(--f-hand)}
+.mono{font-family:var(--f-mono);font-weight:700}
+.amber{color:var(--amber)}.mint{color:var(--mint)}.scarlet{color:var(--scarlet)}.teal{color:var(--teal)}.sky{color:var(--sky)}
+
+/* ===========================================
+   CHROME: episode tag, floors tracker
+   =========================================== */
+.tag{position:absolute;left:80px;top:38px;background:var(--amber);color:var(--ink);font-family:var(--f-disp);font-size:36px;letter-spacing:2px;padding:10px 28px 8px;border:5px solid var(--ink);border-radius:14px;box-shadow:6px 6px 0 var(--ink);rotate:-2deg;z-index:5}
+.tag.side{background:var(--cream);border-style:dashed}
+.floors{position:absolute;right:70px;top:40px;width:150px;z-index:5}
+.floors svg{width:150px;height:auto;display:block}
+
+/* ===========================================
+   COMIC PARTS: panel, bubble, portrait, chips
+   =========================================== */
+.panel{background:var(--cream);color:var(--ink);border:6px solid var(--ink);border-radius:26px;box-shadow:14px 14px 0 var(--sh);padding:30px 40px}
+.panel.dark{background:#141b4d;color:var(--cream);border-color:var(--cream)}
+.bubble{position:absolute;background:#fff;color:var(--ink);border:5px solid var(--ink);border-radius:38px;padding:24px 36px;font-family:var(--f-hand);font-size:50px;line-height:1.14;box-shadow:9px 9px 0 rgba(0,0,0,.35);z-index:3}
+.bubble::after{content:"";position:absolute;width:46px;height:46px;background:#fff;border:5px solid var(--ink);border-top:none;border-left:none;transform:rotate(45deg);bottom:-27px;left:80px}
+.bubble.tr::after{left:auto;right:80px}
+.bubble.pl::after{transform:rotate(135deg);left:-28px;top:calc(50% - 23px);bottom:auto}
+.bubble.pr::after{transform:rotate(-45deg);right:-28px;left:auto;top:calc(50% - 23px);bottom:auto}
+.bubble b{color:#d6204e}
+.pf{position:absolute;display:block;aspect-ratio:1;border-radius:50%;border:6px solid var(--ink);background:var(--bgc,#4cc9f0);overflow:hidden;box-shadow:8px 8px 0 rgba(0,0,0,.4);z-index:2}
+.pf.ring{border-color:var(--cream)}
+.pf svg{display:block;width:100%;height:100%;max-width:none;max-height:none}
+.pf.bob{animation:bob 3.4s ease-in-out infinite}
+@keyframes bob{0%,100%{translate:0 0}50%{translate:0 -12px}}
+.chip{display:inline-block;font-family:var(--f-mono);font-weight:700;font-size:28px;padding:10px 24px;border-radius:999px;border:4px solid var(--ink);background:var(--cream);color:var(--ink);box-shadow:5px 5px 0 var(--ink);white-space:nowrap}
+.chip.a{background:var(--amber)}.chip.m{background:var(--mint)}.chip.s{background:var(--sky)}.chip.r{background:var(--scarlet);color:#fff}.chip.t{background:var(--teal)}.chip.c{background:var(--coral)}
+.io{position:absolute;display:flex;align-items:center;gap:22px}
+.io .lbl{font-family:var(--f-disp);font-size:30px;letter-spacing:3px;color:var(--amber)}
+.paper .io .lbl{color:#c46a00}
+.io .arrow{font-family:var(--f-disp);font-size:56px;color:var(--cream)}
+.paper .io .arrow{color:var(--ink)}
+.code{background:#0e1230;color:#ffe9a8;font-family:var(--f-mono);font-weight:500;font-size:27px;line-height:1.55;border-radius:22px;border:6px solid var(--ink);box-shadow:12px 12px 0 var(--amber);padding:26px 34px;white-space:pre}
+.code .k{color:#4cc9f0}.code .c{color:#7e86c9}.code .s{color:#06d6a0}.code .f{color:#ffb703}
+.note{font-family:var(--f-hand);font-size:38px}
+
+/* ===========================================
+   DIAGRAM PARTS
+   =========================================== */
+.n{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--f-mono);font-weight:700;font-size:25px;background:#fff;color:var(--ink);border:5px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:10px 14px;line-height:1.15}
+.n.pill{border-radius:999px;background:var(--ink);color:var(--cream);box-shadow:6px 6px 0 var(--amber)}
+.n.t{background:var(--teal)}.n.m{background:var(--mint)}.n.s{background:var(--sky)}.n.a{background:var(--amber)}.n.r{background:var(--scarlet);color:#fff}.n.c{background:var(--coral)}
+.dg{position:absolute;overflow:visible}
+.flow{stroke-dasharray:14 12;animation:dash 1s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-26}}
+.arr{font-family:var(--f-disp);font-size:64px;color:var(--ink)}
+.slide .grow{opacity:0;transform:scale(.6);transform-origin:left center;transition:opacity .6s var(--ease) var(--d,0s),transform .7s cubic-bezier(.34,1.56,.64,1) var(--d,0s)}
+.slide.visible .grow{opacity:1;transform:none}
+
+/* score meters */
+.meter{height:34px;border:4px solid var(--ink);border-radius:999px;background:rgba(14,18,48,.18);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--mint);border-right:4px solid var(--ink);transition:width 1.5s var(--ease) var(--d,.6s)}
+.slide.visible .meter i{width:var(--w)}
+
+/* decorative scenery */
+.stars span{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;opacity:.2;animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.15;transform:scale(.8)}50%{opacity:.95;transform:scale(1.3)}}
+.moon{position:absolute;width:150px;height:150px;border-radius:50%;box-shadow:inset -38px 8px 0 0 #ffe9a8;filter:drop-shadow(0 0 30px rgba(255,233,168,.55))}
+.skyline{position:absolute;left:0;bottom:0;width:1920px;height:420px;pointer-events:none}
+.skyline svg,.tower svg{max-width:none;max-height:none;display:block}
+.tower{position:absolute}
+.office{animation:office 1.8s ease-in-out infinite}
+@keyframes office{0%,100%{filter:drop-shadow(0 0 4px #ffd166)}50%{filter:drop-shadow(0 0 22px #ffd166)}}
+.beacon{animation:blink 1.4s steps(2,end) infinite}
+@keyframes blink{50%{opacity:.1}}
+.sign{filter:drop-shadow(0 0 10px #ffb703)}
+
+/* deck controls (outside the stage design) */
+.deck-controls{display:flex;align-items:center;gap:16px;font-family:'Outfit',sans-serif;font-size:14px;color:#fff;opacity:0;transition:opacity .4s}
+.deck-controls.show{opacity:.75}
+.progress{width:220px;height:6px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:#ffb703;transition:width .4s}
+
+/* ---- BUILD STEPS: elements with class .st + data-step="n" appear on the n-th key press ---- */
+.st{opacity:0;transform:translateY(46px);pointer-events:none;transition:opacity .6s var(--ease) var(--d,0s),transform .8s var(--ease) var(--d,0s)}
+.st.l{transform:translateX(-130px)}
+.st.r{transform:translateX(130px)}
+.st.pop{transform:scale(.45) rotate(-8deg);transition-timing-function:cubic-bezier(.34,1.56,.64,1)}
+.st.on{opacity:1;transform:none;pointer-events:auto}
+@media print{.st{opacity:1 !important;transform:none !important}}
+</style>
+</head>
+<body>
+<!-- ===========================================
+     SHARED SVG DEFS: arrowheads + the four hand-drawn faces + expressions
+     Faces are drawn on a 200x220 grid; <i class="pf" data-who=".." data-ex=".."> pulls them in via JS.
+     =========================================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <marker id="ah-ink" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0e1230"/></marker>
+  <marker id="ah-amber" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ffb703"/></marker>
+  <marker id="ah-cream" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#fff2d1"/></marker>
+  <marker id="ah-scarlet" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ef476f"/></marker>
+  <marker id="ah-coral" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff7f50"/></marker>
+
+  <!-- shared head: neck, ears, face, cheeks, eyes, nose. Skin colour comes from --skin -->
+  <g id="head">
+    <rect x="84" y="136" width="32" height="42" rx="12" style="fill:var(--skin)"/>
+    <rect x="84" y="152" width="32" height="26" rx="10" fill="#000" opacity=".12"/>
+    <circle cx="49" cy="108" r="10" style="fill:var(--skin)"/><circle cx="151" cy="108" r="10" style="fill:var(--skin)"/>
+    <ellipse cx="100" cy="100" rx="52" ry="58" style="fill:var(--skin)"/>
+    <circle cx="68" cy="124" r="9" fill="#ff7b9c" opacity=".3"/><circle cx="132" cy="124" r="9" fill="#ff7b9c" opacity=".3"/>
+    <ellipse cx="80" cy="102" rx="7" ry="8.5" fill="#14122b"/><ellipse cx="120" cy="102" rx="7" ry="8.5" fill="#14122b"/>
+    <circle cx="82.5" cy="98.5" r="2.6" fill="#fff"/><circle cx="122.5" cy="98.5" r="2.6" fill="#fff"/>
+    <path d="M97 112 Q100 118 103 112" stroke="#000" stroke-opacity=".25" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- PRIYA: recruiter. Teal blazer, long dark hair, hoop earrings, ID lanyard -->
+  <g id="priya">
+    <path d="M44 104 C34 28 166 28 156 104 C160 150 156 188 146 206 L54 206 C44 188 40 150 44 104Z" fill="#17101f"/>
+    <path d="M12 222 C12 182 52 164 100 164 C148 164 188 182 188 222Z" fill="#1c9a94"/>
+    <path d="M78 166 L100 198 L122 166Z" fill="#fff"/>
+    <path d="M78 166 L100 198 L84 216 L56 182Z" fill="#157a76"/><path d="M122 166 L100 198 L116 216 L144 182Z" fill="#157a76"/>
+    <path d="M88 166 L100 200 L112 166" stroke="#ef476f" stroke-width="5" fill="none"/>
+    <rect x="89" y="198" width="22" height="18" rx="3" fill="#fff" stroke="#0e1230" stroke-width="2.5"/>
+    <use href="#head" style="--skin:#c98a5e"/>
+    <path d="M47 104 C44 54 84 34 116 40 C150 46 158 76 153 104 C146 86 132 74 112 68 C88 62 62 78 47 104Z" fill="#17101f"/>
+    <path d="M70 58 Q96 46 122 56" stroke="#5b4a7a" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/>
+    <circle cx="47" cy="126" r="6" fill="none" stroke="#ffb703" stroke-width="3.5"/><circle cx="153" cy="126" r="6" fill="none" stroke="#ffb703" stroke-width="3.5"/>
+  </g>
+
+  <!-- HERMIONE: bushy brown hair, burgundy sweater, gold-striped tie -->
+  <g id="hermione">
+    <g fill="#7a4a24">
+      <circle cx="100" cy="34" r="34"/><circle cx="62" cy="46" r="28"/><circle cx="138" cy="46" r="28"/>
+      <circle cx="40" cy="78" r="26"/><circle cx="160" cy="78" r="26"/><circle cx="30" cy="116" r="24"/><circle cx="170" cy="116" r="24"/>
+      <circle cx="36" cy="150" r="22"/><circle cx="164" cy="150" r="22"/><circle cx="48" cy="180" r="20"/><circle cx="152" cy="180" r="20"/>
+    </g>
+    <path d="M12 222 C12 182 52 164 100 164 C148 164 188 182 188 222Z" fill="#8f1d35"/>
+    <path d="M80 166 L100 192 L120 166Z" fill="#fff"/>
+    <path d="M94 190 L106 190 L110 222 L100 226 L90 222Z" fill="#ffb703"/>
+    <path d="M92 202 L108 202 M91 212 L109 212" stroke="#8f1d35" stroke-width="4"/>
+    <use href="#head" style="--skin:#e9b98f"/>
+    <path d="M50 100 C46 58 82 40 110 44 C142 46 154 70 150 100 C140 80 124 70 104 68 C82 66 62 78 50 100Z" fill="#7a4a24"/>
+    <path d="M62 58 Q84 44 110 48" stroke="#a96d38" stroke-width="7" fill="none" stroke-linecap="round" opacity=".85"/>
+    <circle cx="34" cy="96" r="6" fill="#a96d38" opacity=".7"/><circle cx="166" cy="92" r="6" fill="#a96d38" opacity=".7"/>
+  </g>
+
+  <!-- HARRY: round glasses, messy black hair, lightning scar, red-and-gold tie -->
+  <g id="harry">
+    <path d="M12 222 C12 182 52 164 100 164 C148 164 188 182 188 222Z" fill="#2b2f57"/>
+    <path d="M80 166 L100 190 L120 166Z" fill="#fff"/>
+    <path d="M95 188 L105 188 L108 220 L100 224 L92 220Z" fill="#c8102e"/>
+    <path d="M93 200 L107 200 M92 210 L108 210" stroke="#ffb703" stroke-width="4"/>
+    <use href="#head" style="--skin:#f3cba2"/>
+    <path d="M48 104 C40 56 66 32 100 34 C134 32 160 56 152 104 L146 80 L136 96 L128 68 L116 88 L104 62 L92 86 L80 64 L72 90 L60 70Z" fill="#17101f"/>
+    <path d="M106 68 L100 79 L106 79 L99 91" stroke="#d62839" stroke-width="3.6" fill="none" stroke-linejoin="miter"/>
+    <g fill="rgba(255,255,255,.18)" stroke="#2a1d12" stroke-width="5"><circle cx="80" cy="102" r="17"/><circle cx="120" cy="102" r="17"/></g>
+    <path d="M97 100 Q100 95 103 100 M63 99 L52 97 M137 99 L148 97" stroke="#2a1d12" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- RON: fiery red hair, freckles, rust sweater -->
+  <g id="ron">
+    <path d="M12 222 C12 182 52 164 100 164 C148 164 188 182 188 222Z" fill="#b23a48"/>
+    <path d="M22 206 C60 190 140 190 178 206" stroke="#ffb703" stroke-width="7" fill="none"/>
+    <use href="#head" style="--skin:#f7d6b8"/>
+    <path d="M46 104 C36 48 70 30 102 32 C134 30 166 48 154 104 C150 86 142 74 128 70 C118 80 84 80 72 70 C58 74 50 88 46 104Z" fill="#d9531e"/>
+    <circle cx="70" cy="42" r="14" fill="#d9531e"/><circle cx="104" cy="30" r="16" fill="#d9531e"/><circle cx="136" cy="44" r="14" fill="#d9531e"/>
+    <path d="M70 46 Q96 34 126 46" stroke="#f08a4b" stroke-width="6" fill="none" stroke-linecap="round" opacity=".85"/>
+    <g fill="#b9794f" opacity=".85"><circle cx="66" cy="116" r="2.2"/><circle cx="74" cy="122" r="2.2"/><circle cx="62" cy="124" r="2.2"/><circle cx="134" cy="116" r="2.2"/><circle cx="126" cy="122" r="2.2"/><circle cx="138" cy="124" r="2.2"/><circle cx="96" cy="108" r="2"/><circle cx="104" cy="108" r="2"/></g>
+  </g>
+
+  <!-- EXPRESSIONS: brows + mouth, drawn over any face -->
+  <g id="ex-happy" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M66 82 Q80 73 94 81"/><path d="M106 81 Q120 73 134 82"/>
+    <path d="M76 126 Q100 156 124 126Z" fill="#7a1f2b" stroke-width="4"/><path d="M86 136 Q100 146 114 136" stroke="#ff8fa3" stroke-width="5"/>
+  </g>
+  <g id="ex-smug" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M66 84 Q80 80 94 84"/><path d="M106 76 Q120 70 134 78"/>
+    <path d="M80 132 Q106 144 124 126"/>
+  </g>
+  <g id="ex-neutral" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M68 83 H92"/><path d="M108 83 H132"/><path d="M86 134 H114"/>
+  </g>
+  <g id="ex-worried" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M66 87 L94 76"/><path d="M106 76 L134 87"/>
+    <path d="M82 136 Q91 128 100 135 Q109 142 118 134"/>
+    <path d="M142 70 Q150 82 142 90 Q134 82 142 70Z" fill="#9be4ff" stroke="#14122b" stroke-width="2.5"/>
+  </g>
+  <g id="ex-sad" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M64 90 L94 76"/><path d="M106 76 L136 90"/>
+    <path d="M82 140 Q100 122 118 140"/>
+    <path d="M72 116 Q80 130 72 138 Q64 130 72 116Z" fill="#9be4ff" stroke="#14122b" stroke-width="2.5"/>
+  </g>
+  <g id="ex-wow" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M66 76 Q80 66 94 76"/><path d="M106 76 Q120 66 134 76"/>
+    <ellipse cx="100" cy="136" rx="10" ry="13" fill="#7a1f2b" stroke-width="4"/>
+  </g>
+</defs>
+</svg>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+<!-- ============ 1: AGENDA ============ -->
+<section class="slide night" data-title="Ep 4 intro">
+  <div class="stars abs" data-n="50" data-h="500" style="inset:0"></div>
+  <div class="moon abs" style="left:1650px;top:60px;width:120px;height:120px"></div>
+  <div class="skyline" data-seed="31" style="opacity:.9"></div>
+  <div class="tag reveal">EPISODE 4 · THE PLAN</div>
+  <div class="over abs reveal" style="left:110px;top:150px;--d:.2s">Today's episode</div>
+  <div class="h2 abs reveal" style="left:110px;top:205px;width:1500px;--d:.35s">Here's what we'll talk about</div>
+
+  <div class="intro-row st" data-step="1" style="top:330px;--d:0s"><i>1</i><span>Why a table of fields isn't a verdict: <b class="amber">Priya's rubric</b></span></div>
+  <div class="intro-row st" data-step="2" style="top:438px;--d:0s"><i>2</i><span><b class="amber">State</b> in depth: the node contract and last-write-wins</span></div>
+  <div class="intro-row st" data-step="3" style="top:546px;--d:0s"><i>3</i><span><b class="amber">Nodes</b> are just Python: with an LLM call, or without</span></div>
+  <div class="intro-row st" data-step="4" style="top:654px;--d:0s"><i>4</i><span><b class="amber">Edges</b> so far: <b class="amber">add_edge</b>, and a peek at conditional edges</span></div>
+  <div class="intro-row st" data-step="5" style="top:762px;--d:0s"><i>5</i><span>Build the pipeline: <b class="amber">parse → score → summary</b></span></div>
+  <div class="intro-row st" data-step="6" style="top:870px;--d:0s"><i>6</i><span>State <b class="amber">schema design</b> judgment</span></div>
+
+  <i class="pf ring st pop bob" data-step="1" data-who="priya" data-ex="happy" style="left:1560px;top:520px;width:270px;--bgc:#2ec4b6;--d:0.2s"></i>
+  <style>
+    .intro-row{position:absolute;left:110px;width:1340px;height:96px;display:flex;align-items:center;gap:26px;padding:0 34px 0 22px;font-size:35px;font-weight:600;line-height:1.15;background:#141b4d;color:var(--cream);border:5px solid var(--cream);border-radius:24px;box-shadow:9px 9px 0 var(--amber);z-index:2}
+    .intro-row i{flex:none;width:60px;height:60px;border-radius:50%;background:var(--amber);color:var(--ink);border:4px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-style:normal;font-size:36px}
+  </style>
+</section>
+
+<!-- ============ 2: RECAP ============ -->
+<section class="slide paper" data-ep="4" data-title="Recap Ep 3">
+  <div class="tag reveal">EPISODE 4 · RECAP</div>
+  <div class="h2 abs reveal" style="left:110px;top:116px;font-size:84px;--d:.15s">Where Video 3 left us</div>
+
+  <div class="n pill st" data-step="1" style="left:110px;top:290px;width:200px;height:110px;--d:0s">START</div>
+  <span class="abs arr st" data-step="1" style="left:330px;top:296px;--d:0.1s">→</span>
+  <div class="n t st pop" data-step="1" style="left:420px;top:290px;width:400px;height:110px;font-size:32px;--d:0.2s">parse_resume</div>
+  <span class="abs arr st" data-step="1" style="left:840px;top:296px;--d:0.3s">→</span>
+  <div class="n pill st" data-step="1" style="left:930px;top:290px;width:200px;height:110px;--d:0.4s">END</div>
+  <div class="abs note st" data-step="1" style="left:1180px;top:318px;font-size:40px;--d:0.5s">one node, one LLM call ✦</div>
+
+  <div class="step st" data-step="2" style="left:110px;top:480px;--d:0s"><i>1</i><span>One utility: <span class="mono" style="font-size:28px">call_llm()</span></span></div>
+  <div class="step st" data-step="3" style="left:690px;top:480px;--d:0s"><i>2</i><span>One graph: <span class="mono" style="font-size:28px">StateGraph</span> + <span class="mono" style="font-size:28px">add_node</span></span></div>
+  <div class="step st" data-step="4" style="left:1270px;top:480px;--d:0s"><i>3</i><span>One result: four fields in the state</span></div>
+
+  <div class="abs st" data-step="4" style="left:110px;top:670px;display:flex;gap:18px;--d:0.2s"><span class="chip t">name</span><span class="chip s">years</span><span class="chip m">skills</span><span class="chip a">leadership</span></div>
+
+  <i class="pf ring st pop" data-step="5" data-who="priya" data-ex="neutral" style="left:110px;top:780px;width:220px;--bgc:#2ec4b6;--d:0s;border-color:var(--ink)"></i>
+  <div class="bubble pl st" data-step="5" style="left:380px;top:800px;width:1100px;--d:0.2s">Fields are nice. But now I need a <b>verdict</b>.</div>
+  <style>
+    .step{position:absolute;width:540px;height:140px;display:flex;align-items:center;gap:20px;padding:0 26px 0 20px;font-size:31px;font-weight:600;line-height:1.2;background:#fff;border:5px solid var(--ink);border-radius:22px;box-shadow:8px 8px 0 var(--amber)}
+    .step i{flex:none;width:64px;height:64px;border-radius:50%;background:var(--amber);border:4px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-style:normal;font-size:38px}
+  </style>
+</section>
+
+<!-- ============ 3: PROBLEM ============ -->
+<section class="slide night" data-ep="4" data-title="Ep 4 problem">
+  <div class="stars abs" data-n="40" data-h="400" style="inset:0"></div>
+  <div class="tag reveal">EPISODE 4 · THE VERDICT</div>
+  <div class="over abs reveal" style="left:110px;top:150px;--d:.2s">The problem</div>
+  <div class="h2 abs reveal" style="left:110px;top:205px;width:800px;--d:.35s">Fields aren't<br>a verdict.</div>
+  <p class="abs lead st" data-step="2" style="left:110px;top:430px;width:780px;font-size:38px;--d:0s">Priya needs a <b class="amber">score</b> on her own rubric, plus a short <b class="amber">note</b> she can hand to the hiring manager.</p>
+  <i class="pf ring st pop" data-step="1" data-who="priya" data-ex="neutral" style="left:110px;top:640px;width:250px;--bgc:#2ec4b6;--d:0s"></i>
+  <div class="bubble pl st" data-step="1" style="left:410px;top:655px;width:480px;--d:0.2s">A table of fields isn't a <b>decision</b>.</div>
+
+  <div class="panel abs st r" data-step="3" style="left:960px;top:170px;width:850px;height:640px;--d:0s">
+    <div class="disp" style="font-size:52px">PRIYA'S RUBRIC <span style="font-size:34px;color:#c46a00">· 100 points</span></div>
+    <div style="display:flex;margin:20px 0 26px;height:62px;border:5px solid var(--ink);border-radius:16px;overflow:hidden;font-family:var(--f-disp);font-size:38px;text-align:center;line-height:52px">
+      <div style="width:40%;background:var(--sky)">40</div><div style="width:40%;background:var(--mint);border-left:5px solid var(--ink);border-right:5px solid var(--ink)">40</div><div style="width:20%;background:var(--amber)">20</div>
+    </div>
+    <div class="rub"><i style="background:var(--sky)"></i><span><b>Experience</b> · 5+ years</span><em>up to 40</em></div>
+    <div class="rub"><i style="background:var(--mint)"></i><span><b>Skills</b> · overlap with Python, distributed systems, Kubernetes, SQL</span><em>up to 40</em></div>
+    <div class="rub"><i style="background:var(--amber)"></i><span><b>Leadership</b> · mentioned on the resume</span><em>up to 20</em></div>
+    <div class="abs" style="left:40px;right:40px;bottom:34px;padding:20px 26px;border:5px dashed var(--ink);border-radius:20px;font-family:var(--f-hand);font-size:42px;line-height:1.1;background:#fff">+ a two-sentence <b style="color:#d6204e">note</b> for the hiring manager</div>
+  </div>
+  <div class="io st" data-step="4" style="left:110px;top:925px;--d:0s"><span class="lbl">INPUT</span><span class="chip a">raw resume</span><span class="arrow">→</span><span class="lbl">OUTPUT</span><span class="chip m">fields + score + rationale + summary</span></div>
+  <style>
+    .rub{display:flex;align-items:center;gap:18px;font-size:30px;line-height:1.2;margin-bottom:18px}
+    .rub i{flex:none;width:34px;height:34px;border-radius:9px;border:4px solid var(--ink)}
+    .rub span{flex:1}.rub em{flex:none;font-style:normal;font-family:var(--f-mono);font-weight:700;font-size:26px;background:var(--ink);color:var(--cream);padding:4px 14px;border-radius:99px}
+  </style>
+</section>
+
+<!-- ============ 4: STATE ============ -->
+<section class="slide paper" data-ep="4" data-title="State">
+  <div class="tag reveal">EPISODE 4 · STATE</div>
+  <div class="h2 abs reveal" style="left:110px;top:116px;font-size:84px;--d:.15s">State: the shape of your data</div>
+
+  <div class="code abs st l" data-step="1" style="left:110px;top:290px;width:900px;height:500px;font-size:30px;--d:0s"><span class="k">class</span> <span class="f">ScreenerState</span>(TypedDict):
+    resume_text: <span class="k">str</span>
+    candidate_name: <span class="k">str</span>
+    years_experience: <span class="k">str</span>
+    skills: <span class="k">str</span>
+    leadership: <span class="k">str</span>
+    score: <span class="k">int</span>
+    score_rationale: <span class="k">str</span>
+    summary: <span class="k">str</span></div>
+
+  <div class="step st r" data-step="2" style="left:1110px;top:290px;width:700px;--d:0s"><i>1</i>A plain <b class="mono" style="font-size:28px">TypedDict</b> (or a dataclass)</div>
+  <div class="step st r" data-step="3" style="left:1110px;top:462px;width:700px;--d:0s"><i>2</i>Every node <b>reads</b> from it</div>
+  <div class="step st r" data-step="4" style="left:1110px;top:634px;width:700px;--d:0s"><i>3</i>Every node <b>writes</b> back to it</div>
+
+  <div class="abs note st" data-step="5" style="left:110px;top:840px;font-size:40px;--d:0s">The state is the one shared notebook every node passes along.</div>
+  <div class="abs st" data-step="5" style="left:110px;top:965px;display:flex;gap:18px;--d:0.2s"><span class="chip s">TypedDict</span><span class="chip">StateGraph(ScreenerState)</span></div>
+</section>
+
+<!-- ============ 5: NODE CONTRACT ============ -->
+<section class="slide paper" data-ep="4" data-title="Node contract">
+  <div class="tag reveal">EPISODE 4 · THE NODE CONTRACT</div>
+  <div class="h2 abs reveal" style="left:110px;top:116px;font-size:84px;--d:.15s">Whole state in. Partial update out.</div>
+
+  <div class="panel abs st l" data-step="1" style="left:110px;top:290px;width:520px;height:400px;padding:24px 34px;--d:0s">
+    <div class="over" style="font-size:26px;margin-bottom:14px">IN · the entire state</div>
+    <div class="mono" style="font-size:30px;line-height:1.6;font-weight:500">counter: 0<br>note: "initial"</div>
+  </div>
+  <div class="abs arr st" data-step="2" style="left:652px;top:445px;--d:0s">→</div>
+  <div class="n t st pop" data-step="2" style="left:740px;top:410px;width:300px;height:130px;font-size:28px;--d:0.1s">set_counter_<br>to_1</div>
+  <div class="abs arr st" data-step="3" style="left:1068px;top:445px;--d:0s">→</div>
+  <div class="panel abs st r" data-step="3" style="left:1140px;top:290px;width:670px;height:400px;padding:24px 34px;--d:0.1s">
+    <div class="over" style="font-size:26px;margin-bottom:14px">OUT · only what changed</div>
+    <div class="mono" style="font-size:34px;line-height:1.6;background:var(--amber);border:4px solid var(--ink);border-radius:14px;padding:10px 22px;width:fit-content">{"counter": 1}</div>
+    <div class="note" style="margin-top:26px;font-size:40px"><b style="color:#d6204e">note</b> is left alone ✓</div>
+  </div>
+
+  <div class="step st" data-step="4" style="left:110px;top:760px;--d:0s"><i>1</i><span>The node gets the <b>entire</b> state</span></div>
+  <div class="step st" data-step="5" style="left:690px;top:760px;--d:0s"><i>2</i><span>It returns <b>only</b> the fields it changes</span></div>
+  <div class="step st" data-step="6" style="left:1270px;top:760px;--d:0s"><i>3</i><span>LangGraph <b>merges</b> it back for you</span></div>
+  <div class="abs st" data-step="7" style="left:110px;top:965px;display:flex;gap:18px;--d:0s"><span class="chip s">def node(state) -&gt; dict</span><span class="chip">partial update</span><span class="chip a">no full replacement</span></div>
+</section>
+
+<!-- ============ 6: LAST WRITE WINS ============ -->
+<section class="slide paper" data-ep="4" data-title="Last write wins">
+  <div class="tag reveal">EPISODE 4 · DEFAULT MERGE</div>
+  <div class="h2 abs reveal" style="left:110px;top:116px;font-size:84px;--d:.15s">Default merge: last write wins</div>
+
+  <div class="panel abs st" data-step="1" style="left:110px;top:290px;width:520px;height:330px;--d:0s">
+    <div class="over" style="font-size:26px;margin-bottom:14px">START</div>
+    <div class="mono lw">counter: <span>0</span><br>note: <span>"initial"</span></div>
+  </div>
+  <div class="abs arr st" data-step="2" style="left:640px;top:410px;--d:0s">→</div>
+  <div class="panel abs st" data-step="2" style="left:700px;top:290px;width:520px;height:330px;--d:0.1s">
+    <div class="over" style="font-size:26px;margin-bottom:14px">after set_counter_to_1</div>
+    <div class="mono lw">counter: <span class="hl">1</span><br>note: <span>"initial"</span></div>
+  </div>
+  <div class="abs arr st" data-step="3" style="left:1230px;top:410px;--d:0s">→</div>
+  <div class="panel abs st" data-step="3" style="left:1290px;top:290px;width:520px;height:330px;--d:0.1s">
+    <div class="over" style="font-size:26px;margin-bottom:14px">after set_counter_to_2</div>
+    <div class="mono lw">counter: <span class="hl">2</span><br>note: <br><span class="hl" style="font-size:25px;line-height:2.2">"overwritten, not merged"</span></div>
+  </div>
+
+  <div class="panel abs st" data-step="4" style="left:110px;top:690px;width:1700px;height:110px;padding:20px 34px;font-size:36px;font-weight:600;line-height:1.25;--sh:var(--amber);--d:0s">Return a key and the old value is <b style="color:#d6204e">overwritten</b>. No built-in "combine old and new".</div>
+
+  <div class="panel abs st pop" data-step="5" style="left:110px;top:850px;width:1700px;height:130px;padding:16px 34px;border-style:dashed;display:flex;align-items:center;gap:30px;background:#fff;--d:0s">
+    <span class="disp" style="font-size:90px;color:#d6204e;line-height:1">?</span>
+    <span class="note" style="font-size:44px;line-height:1.05">What if two nodes both want to <b style="color:#d6204e">add</b> to a list?</span>
+    <span class="chip a" style="margin-left:auto">reducers · Video 6</span>
+  </div>
+  <style>
+    .lw{font-size:34px;line-height:1.7;font-weight:500}
+    .lw span{background:#fff;border:3px solid var(--ink);border-radius:10px;padding:2px 12px}
+    .lw span.hl{background:var(--amber);font-weight:700}
+  </style>
+</section>
+
+<!-- ============ 7: NODES ARE JUST PYTHON ============ -->
+<section class="slide paper" data-ep="4" data-title="Nodes are Python">
+  <div class="tag reveal">EPISODE 4 · NODES</div>
+  <div class="h2 abs reveal" style="left:110px;top:116px;font-size:84px;--d:.15s">Nodes are just Python.</div>
+
+  <div class="abs st" data-step="1" style="left:110px;top:250px;--d:0s"><span class="chip m" style="font-size:30px">NO LLM · pure Python</span></div>
+  <div class="code abs st l" data-step="1" style="left:110px;top:325px;width:800px;height:380px;font-size:26px;--d:0.1s"><span class="k">def</span> <span class="f">count_words</span>(state):
+    <span class="c"># Pure Python. No LLM, no I/O.</span>
+    n = len(state[<span class="s">"resume_text"</span>].split())
+    <span class="k">return</span> {<span class="s">"word_count"</span>: n}</div>
+
+  <div class="abs st" data-step="2" style="left:1010px;top:250px;--d:0s"><span class="chip a" style="font-size:30px">WITH an LLM call</span></div>
+  <div class="code abs st r" data-step="2" style="left:1010px;top:325px;width:800px;height:380px;font-size:26px;--d:0.1s"><span class="k">def</span> <span class="f">comment_on_tone</span>(state):
+    <span class="c"># An LLM call. Same signature.</span>
+    result = call_llm(<span class="s">"claude"</span>, messages=[...])
+    <span class="k">return</span> {<span class="s">"tone_comment"</span>:
+            result.content}</div>
+
+  <div class="panel abs st pop" data-step="3" style="left:110px;top:760px;width:1700px;height:110px;padding:20px 34px;background:var(--amber);text-align:center;font-size:40px;font-weight:600;--d:0s">Same contract: <b>state in → partial dict out</b>. The body is up to you.</div>
+  <div class="abs st" data-step="4" style="left:110px;top:925px;display:flex;gap:18px;--d:0s"><span class="chip">LLM call</span><span class="chip">pure compute</span><span class="chip">database lookup</span><span class="chip">file I/O</span><span class="chip s">the graph doesn't care</span></div>
+</section>
+
+<!-- ============ 8: EDGES ============ -->
+<section class="slide paper" data-ep="4" data-title="Edges">
+  <div class="tag reveal">EPISODE 4 · EDGES</div>
+  <div class="h2 abs reveal" style="left:110px;top:116px;font-size:84px;--d:.15s">Edges: what runs next?</div>
+
+  <div class="panel abs st l" data-step="1" style="left:110px;top:270px;width:820px;height:560px;--d:0s">
+    <div class="over" style="font-size:28px">UNCONDITIONAL · add_edge</div>
+    <div class="n t" style="left:30px;top:120px;width:300px;height:110px;font-size:26px">parse_resume</div>
+    <span class="abs arr" style="left:345px;top:125px">→</span>
+    <div class="n m" style="left:430px;top:120px;width:350px;height:110px;font-size:24px">score_against_<br>rubric</div>
+    <div class="code" style="position:absolute;left:30px;top:290px;width:760px;font-size:23px;padding:22px 26px;line-height:1.5">builder.add_edge(<span class="s">"parse_resume"</span>,
+                 <span class="s">"score_against_rubric"</span>)</div>
+    <div class="note" style="position:absolute;left:30px;top:445px;font-size:42px;line-height:1.1">Whatever happens in the first node,<br>the graph <b style="color:#d6204e">always</b> goes to the next.</div>
+  </div>
+
+  <div class="panel abs st r" data-step="2" style="left:990px;top:270px;width:820px;height:560px;border-style:dashed;background:#fbf4e2;--d:0s">
+    <div class="over" style="font-size:28px">CONDITIONAL · coming soon</div>
+    <svg class="dg" style="left:0;top:0;width:780px;height:480px" viewBox="0 0 780 480">
+      <g stroke="#0e1230" stroke-width="5" fill="none" stroke-dasharray="14 12" marker-end="url(#ah-ink)">
+        <path d="M290 270 L440 170" marker-end="url(#ah-ink)"/><path d="M290 270 L440 285" marker-end="url(#ah-ink)"/><path d="M290 270 L440 400" marker-end="url(#ah-ink)"/>
+      </g>
+    </svg>
+    <div class="n a" style="left:30px;top:225px;width:260px;height:90px;font-size:22px">score_against_<br>rubric</div>
+    <div class="n r" style="left:450px;top:130px;width:300px;height:70px;font-size:24px">reject</div>
+    <div class="n a" style="left:450px;top:245px;width:300px;height:70px;font-size:24px;background:#fff">interview</div>
+    <div class="n m" style="left:450px;top:360px;width:300px;height:70px;font-size:24px">strong_match</div>
+    <div class="note" style="position:absolute;left:30px;top:455px;font-size:34px;white-space:nowrap">path depends on <b style="color:#d6204e">runtime data</b></div>
+  </div>
+
+  <div class="abs st" data-step="3" style="left:110px;top:880px;display:flex;gap:18px;align-items:center;--d:0s"><span class="chip m">today: linear edges only</span><span class="chip a">conditional edges · Video 7</span></div>
+  <div class="abs note st" data-step="3" style="left:110px;top:965px;font-size:38px;--d:0.1s">Just know the word exists, so it doesn't feel like a gap later.</div>
+</section>
+
+<!-- ============ 9: THE FIX ============ -->
+<section class="slide paper" data-ep="4" data-title="Ep 4 solution">
+  <div class="tag reveal">EPISODE 4 · THE FIX</div>
+  <div class="h2 abs reveal" style="left:110px;top:112px;font-size:80px;--d:.15s">A three-step assembly line.</div>
+
+  <div class="n pill st" data-step="1" style="left:110px;top:238px;width:130px;height:104px;--d:0s">START</div>
+  <span class="abs arr st" data-step="1" style="left:250px;top:240px;--d:0.1s">→</span>
+  <div class="n t st pop" data-step="1" style="left:320px;top:238px;width:330px;height:104px;--d:0.2s">parse_resume</div>
+  <span class="abs arr st" data-step="2" style="left:668px;top:240px;--d:0s">→</span>
+  <div class="n m st pop" data-step="2" style="left:740px;top:238px;width:330px;height:104px;font-size:23px;--d:0.1s">score_against_<br>rubric</div>
+  <span class="abs arr st" data-step="3" style="left:1088px;top:240px;--d:0s">→</span>
+  <div class="n a st pop" data-step="3" style="left:1160px;top:238px;width:330px;height:104px;--d:0.1s">generate_summary</div>
+  <span class="abs arr st" data-step="3" style="left:1508px;top:240px;--d:0.2s">→</span>
+  <div class="n pill st" data-step="3" style="left:1580px;top:238px;width:130px;height:104px;--d:0.3s">END</div>
+
+  <div class="abs note st" data-step="1" style="left:110px;top:368px;width:200px;font-size:34px;line-height:1.1;--d:0.3s">state grows<br>field by field ↓</div>
+  <div class="abs" style="left:320px;top:372px;width:330px">
+    <div class="sc st" data-step="1" style="--d:0.4s;background:var(--teal)">+ candidate_name</div><div class="sc st" data-step="1" style="--d:0.5s;background:var(--teal)">+ years_experience</div><div class="sc st" data-step="1" style="--d:0.6s;background:var(--teal)">+ skills</div><div class="sc st" data-step="1" style="--d:0.7s;background:var(--teal)">+ leadership</div>
+  </div>
+  <div class="abs" style="left:740px;top:372px;width:330px">
+    <div class="sc st" data-step="2" style="--d:0.3s;background:var(--mint)">+ score</div><div class="sc st" data-step="2" style="--d:0.4s;background:var(--mint)">+ score_rationale</div>
+  </div>
+  <div class="abs" style="left:1160px;top:372px;width:330px">
+    <div class="sc st" data-step="3" style="--d:0.4s;background:var(--amber)">+ summary</div>
+  </div>
+
+  <div class="cardio st" data-step="4" style="left:320px;--d:0s"><b>parse_resume</b>reads <i>resume_text</i><br>writes 4 fields</div>
+  <div class="cardio st" data-step="5" style="left:740px;--d:0s"><b>score_against_rubric</b>reads the parsed fields + rubric<br>writes score, rationale</div>
+  <div class="cardio st" data-step="6" style="left:1160px;--d:0s"><b>generate_summary</b>reads name, score, rationale<br>writes summary</div>
+
+  <div class="abs st" data-step="7" style="left:110px;top:985px;display:flex;gap:18px;--d:0s"><span class="chip">add_edge</span><span class="chip">linear pipeline</span><span class="chip s">state grows as nodes are added</span></div>
+  <style>
+    .sc{font-family:var(--f-mono);font-weight:700;font-size:22px;padding:6px 14px;margin-bottom:8px;border:4px solid var(--ink);border-radius:12px;width:fit-content}
+    .cardio{position:absolute;top:660px;width:330px;height:250px;padding:20px 22px;background:#fff;border:5px solid var(--ink);border-radius:20px;box-shadow:8px 8px 0 var(--amber);font-size:27px;font-weight:600;line-height:1.35}
+    .cardio b{display:block;font-family:var(--f-mono);font-size:24px;margin-bottom:12px;padding-bottom:10px;border-bottom:4px dashed var(--ink)}
+    .cardio i{font-family:var(--f-mono);font-style:normal;font-size:23px;background:rgba(255,183,3,.35);padding:0 6px;border-radius:6px}
+  </style>
+</section>
+
+<!-- ============ 10: RESULTS ============ -->
+<section class="slide paper" data-ep="4" data-title="Ep 4 results">
+  <div class="tag reveal">EPISODE 4 · THE RESULT</div>
+  <div class="h2 abs reveal" style="left:110px;top:112px;font-size:80px;--d:.15s">Same line, three very different results.</div>
+
+  <div class="rc st" data-step="1" style="left:110px;--sh:#ffb703;--d:0s"><i class="pf" data-who="hermione" data-ex="happy" style="left:20px;top:46px;width:150px;--bgc:#ffb703;box-shadow:none"></i><div class="in"><div class="disp" style="font-size:44px">Hermione</div><div class="meter"><i style="--w:100%;--d:.5s"></i></div><div class="sn mint-d">100</div></div></div>
+  <div class="rc st" data-step="2" style="left:690px;--sh:#4cc9f0;--d:0s"><i class="pf" data-who="harry" data-ex="neutral" style="left:20px;top:46px;width:150px;--bgc:#4cc9f0;box-shadow:none"></i><div class="in"><div class="disp" style="font-size:44px">Harry</div><div class="meter"><i style="--w:60%;--d:.5s;background:var(--amber)"></i></div><div class="sn amber-d">60</div></div></div>
+  <div class="rc st" data-step="3" style="left:1270px;--sh:#ef476f;--d:0s"><i class="pf" data-who="ron" data-ex="sad" style="left:20px;top:46px;width:150px;--bgc:#ef476f;box-shadow:none"></i><div class="in"><div class="disp" style="font-size:44px">Ron</div><div class="meter"><i style="--w:2%;--d:.5s;background:var(--scarlet)"></i></div><div class="sn red-d">0</div></div></div>
+
+  <div class="panel abs st" data-step="4" style="left:110px;top:620px;width:1700px;height:130px;padding:20px 34px;font-size:36px;font-weight:600;line-height:1.25;--sh:var(--amber);--d:0s">Purely linear, no branching, no loops. Still a <b>legitimate, useful pipeline</b>. Not every graph needs to branch to earn being a graph.</div>
+
+  <i class="pf ring st pop" data-step="5" data-who="priya" data-ex="happy" style="left:110px;top:785px;width:165px;--bgc:#2ec4b6;--d:0s;border-color:var(--ink)"></i>
+  <div class="bubble pl st" data-step="5" style="left:330px;top:800px;width:730px;--d:0.2s">Finally, a number I can <b>sort</b> by.</div>
+  <div class="bubble pl st" data-step="6" style="left:1120px;top:800px;width:690px;font-size:44px;--d:0s">But they all get the <b>same treatment</b>…</div>
+  <div class="abs st" data-step="7" style="left:110px;top:985px;display:flex;gap:18px;--d:0s"><span class="chip">add_edge</span><span class="chip">linear pipeline</span><span class="chip a">next: decisions · Video 7</span></div>
+  <style>
+    .rc{position:absolute;top:290px;width:540px;height:250px;background:#fff;border:6px solid var(--ink);border-radius:24px;box-shadow:10px 10px 0 var(--sh)}
+    .rc .in{position:absolute;left:200px;top:26px;right:26px}
+    .rc .sn{font-family:var(--f-disp);font-size:90px;line-height:1;margin-top:14px}
+    .mint-d{color:#04a07a}.amber-d{color:#d98a00}.red-d{color:#d6204e}
+  </style>
+</section>
+
+<!-- ============ 11: SCHEMA DESIGN ============ -->
+<section class="slide paper" data-ep="4" data-title="Schema design">
+  <div class="tag reveal">EPISODE 4 · SCHEMA DESIGN</div>
+  <div class="h2 abs reveal" style="left:110px;top:112px;font-size:80px;--d:.15s">Three habits for a good schema</div>
+
+  <div class="dcard st" data-step="1" style="left:110px;--d:0s"><i>1</i>
+    <div class="dt">Minimal vs. debuggable</div>
+    <p>Keep <b>score_rationale</b> and the parsed fields. You can see <b>why</b> a score came out, without re-running anything.</p>
+    <div class="chip m" style="font-size:24px">debuggable wins</div>
+  </div>
+  <div class="dcard st" data-step="2" style="left:690px;--d:0s"><i>2</i>
+    <div class="dt">Required vs. optional</div>
+    <p>Every field is required unless you say otherwise. If a node may skip it, <b>say so</b>.</p>
+    <div class="code" style="font-size:22px;padding:16px 20px;box-shadow:6px 6px 0 var(--amber)">manual_review: <span class="f">NotRequired</span>[<span class="k">bool</span>]</div>
+  </div>
+  <div class="dcard st" data-step="3" style="left:1270px;--d:0s"><i>3</i>
+    <div class="dt">One field, one purpose</div>
+    <p style="margin-bottom:12px">Don't cram two things into one string.</p>
+    <div class="code" style="font-size:21px;padding:14px 18px;box-shadow:6px 6px 0 var(--scarlet);margin-bottom:12px"><span style="color:#ef476f">✗</span> <span class="s">"score: 82, rationale: ..."</span></div>
+    <div class="code" style="font-size:21px;padding:14px 18px;box-shadow:6px 6px 0 var(--mint)"><span style="color:#06d6a0">✓</span> score: <span class="k">int</span>
+  score_rationale: <span class="k">str</span></div>
+  </div>
+
+  <div class="abs note st" data-step="4" style="left:110px;top:870px;font-size:42px;--d:0s">A schema that grows over several videos is the normal shape of building a graph.</div>
+  <style>
+    .dcard{position:absolute;top:290px;width:540px;height:500px;padding:34px 30px 24px;background:#fff;border:6px solid var(--ink);border-radius:24px;box-shadow:10px 10px 0 var(--amber)}
+    .dcard>i{position:absolute;left:24px;top:-34px;width:68px;height:68px;border-radius:50%;background:var(--amber);border:5px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-style:normal;font-size:42px}
+    .dcard .dt{font-family:var(--f-disp);font-size:44px;line-height:1.05;margin:26px 0 18px}
+    .dcard p{font-size:30px;font-weight:600;line-height:1.3;margin-bottom:26px}
+    .dcard p b{color:#d6204e}
+  </style>
+</section>
+
+<!-- ============ 12: RECAP + NEXT ============ -->
+<section class="slide night" data-ep="4" data-title="Recap + next">
+  <div class="stars abs" data-n="40" data-h="400" style="inset:0"></div>
+  <div class="tag reveal">EPISODE 4 · RECAP</div>
+  <div class="h2 abs reveal" style="left:110px;top:140px;--d:.2s">What we <span class="amber">locked in</span></div>
+
+  <div class="intro-row st" data-step="1" style="top:330px;--d:0s"><i>1</i><span><b class="amber">State</b> is one shared <b class="mono">TypedDict</b></span></div>
+  <div class="intro-row st" data-step="2" style="top:440px;--d:0s"><i>2</i><span><b class="amber">Nodes</b>: whole state in, partial dict out</span></div>
+  <div class="intro-row st" data-step="3" style="top:550px;--d:0s"><i>3</i><span><b class="amber">add_edge</b> always goes to the next node</span></div>
+  <div class="intro-row st" data-step="4" style="top:660px;--d:0s"><i>4</i><span>Default merge is <b class="amber">last write wins</b></span></div>
+  <div class="intro-row st" data-step="5" style="top:770px;--d:0s"><i>5</i><span>The schema <b class="amber">grows</b> as the pipeline does</span></div>
+
+  <i class="pf ring st pop bob" data-step="5" data-who="priya" data-ex="happy" style="left:1560px;top:470px;width:270px;--bgc:#2ec4b6;--d:0.2s"></i>
+
+  <div class="panel abs st pop" data-step="6" style="left:110px;top:910px;width:1700px;height:120px;padding:18px 34px;background:var(--amber);display:flex;align-items:center;gap:30px;--sh:var(--cream);--d:0s">
+    <span class="disp" style="font-size:44px;white-space:nowrap">NEXT VIDEO</span>
+    <span style="font-size:34px;font-weight:600;line-height:1.2">Same pipeline, two syntaxes: <b class="mono" style="font-size:30px">@entrypoint</b> / <b class="mono" style="font-size:30px">@task</b> vs. the Graph API</span>
+  </div>
+  <style>
+    .intro-row{position:absolute;left:110px;width:1340px;height:96px;display:flex;align-items:center;gap:26px;padding:0 34px 0 22px;font-size:35px;font-weight:600;line-height:1.15;background:#141b4d;color:var(--cream);border:5px solid var(--cream);border-radius:24px;box-shadow:9px 9px 0 var(--amber);z-index:2}
+    .intro-row i{flex:none;width:60px;height:60px;border-radius:50%;background:var(--amber);color:var(--ink);border:4px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-style:normal;font-size:36px}
+  </style>
+</section>
+</main>
+</div>
+
+<!-- edit-mode affordances (hidden until hovered or E pressed) -->
+<div class="edit-hotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit text (E)">✏️</button>
+<div class="deck-controls"><span id="counter">1 / 12</span><div class="progress"><i id="bar"></i></div></div>
+
+<style>
+/* edit mode + print helpers */
+.edit-hotzone{position:fixed;top:0;left:0;width:80px;height:80px;z-index:10000;cursor:pointer}
+.edit-toggle{position:fixed;top:14px;left:14px;opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:10001;font-size:22px;padding:8px 12px;border-radius:12px;border:3px solid #0e1230;background:#ffb703;cursor:pointer}
+.edit-toggle.show,.edit-toggle.active{opacity:1;pointer-events:auto}
+body.editing [contenteditable="true"]{outline:2px dashed #ffb703;outline-offset:4px;cursor:text}
+@media print{.reveal,.grow{opacity:1 !important;transform:none !important;transition:none !important}.meter i{width:var(--w) !important}.edit-hotzone,.edit-toggle{display:none !important}}
+</style>
+<script>
+/* ===========================================
+   DECK ENGINE
+   - scales the fixed 1920x1080 stage to the window
+   - keyboard / swipe / wheel navigation, #hash deep links
+   - draws the scenery (stars, skyline, Wayne Enterprises tower), faces and the floor tracker
+   =========================================== */
+(function(){
+  /* ---------- seeded random so the scenery is the same every time ---------- */
+  function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+  /* ---------- faces: <i class="pf" data-who data-ex> ---------- */
+  document.querySelectorAll('.pf').forEach(function(el){
+    var who=el.dataset.who, ex=el.dataset.ex||'neutral';
+    el.innerHTML='<svg viewBox="0 16 200 200" role="img" aria-label="'+who+'"><use href="#'+who+'"/><use href="#ex-'+ex+'"/></svg>';
+  });
+
+  /* ---------- stars ---------- */
+  document.querySelectorAll('.stars').forEach(function(el,k){
+    var r=rng(100+k), n=+el.dataset.n||50, h=+el.dataset.h||500, s='';
+    for(var i=0;i<n;i++){var sz=3+r()*5;s+='<span style="left:'+(r()*1900|0)+'px;top:'+(r()*h|0)+'px;width:'+sz+'px;height:'+sz+'px;animation-delay:'+(r()*3).toFixed(2)+'s"></span>'}
+    el.innerHTML=s;
+  });
+
+  /* ---------- skyline: two layers of buildings with a few lit windows ---------- */
+  document.querySelectorAll('.skyline').forEach(function(el){
+    var r=rng(+el.dataset.seed||1), s='<svg width="1920" height="420" viewBox="0 0 1920 420">';
+    for(var layer=0;layer<2;layer++){
+      var x=-20, col=layer?'#0f1647':'#1a2470', hmax=layer?300:220;
+      while(x<1940){
+        var w=70+r()*90, h=70+r()*hmax;
+        s+='<rect x="'+x.toFixed(0)+'" y="'+(420-h).toFixed(0)+'" width="'+w.toFixed(0)+'" height="'+h.toFixed(0)+'" fill="'+col+'"/>';
+        if(layer){for(var wy=420-h+16;wy<396;wy+=28){for(var wx=x+10;wx<x+w-14;wx+=22){if(r()<.2)s+='<rect x="'+wx.toFixed(0)+'" y="'+wy.toFixed(0)+'" width="9" height="13" fill="#ffd166" opacity="'+(.35+r()*.5).toFixed(2)+'"/>'}}}
+        x+=w+(layer?4:-10);
+      }
+    }
+    s+='<rect x="0" y="402" width="1920" height="18" fill="#070b2c"/></svg>';
+    el.innerHTML=s;
+  });
+
+  /* ---------- the Wayne Enterprises tower ---------- */
+  document.querySelectorAll('.tower').forEach(function(el){
+    var r=rng(+el.dataset.seed||3), hi=el.dataset.hi==='1';
+    function win(x,y,w,h,lit,extra){return '<rect '+(extra||'')+' x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3" fill="'+(lit?'#ffd166':'#0b1033')+'" opacity="'+(lit?(.5+r()*.5).toFixed(2):1)+'"/>'}
+    var s='<svg viewBox="0 0 560 1000" preserveAspectRatio="xMidYMax meet" style="width:100%;height:100%">';
+    s+='<rect x="272" y="34" width="16" height="108" fill="#2a3270"/><circle class="beacon" cx="280" cy="28" r="10" fill="#ff4d6d"/>';
+    s+='<rect x="205" y="140" width="150" height="126" rx="6" fill="#232c70"/>';
+    s+='<rect x="140" y="262" width="280" height="200" rx="6" fill="#1e2763"/>';
+    s+='<rect x="80" y="458" width="400" height="500" rx="6" fill="#1b2259"/><rect x="396" y="458" width="84" height="500" fill="#121945"/>';
+    s+='<rect x="40" y="950" width="480" height="50" fill="#0c1137"/><rect x="250" y="955" width="60" height="45" fill="#ffd166"/>';
+    for(var j=0;j<2;j++)for(var i=0;i<3;i++)s+=win(222+i*44,166+j*50,24,32,r()<.6);
+    for(var j2=0;j2<3;j2++)for(var i2=0;i2<5;i2++)s+=win(162+i2*50,285+j2*52,26,34,r()<.6);
+    s+='<g class="sign"><rect x="100" y="470" width="360" height="86" rx="10" fill="#0b1033" stroke="#ffb703" stroke-width="5"/>'
+     +'<text x="280" y="512" text-anchor="middle" font-family="Lilita One" font-size="40" letter-spacing="6" fill="#ffd166">WAYNE</text>'
+     +'<text x="280" y="544" text-anchor="middle" font-family="Lilita One" font-size="27" letter-spacing="4" fill="#fff2d1">ENTERPRISES</text></g>';
+    for(var j3=0;j3<7;j3++)for(var i3=0;i3<8;i3++){
+      var isOffice=hi&&i3===7&&j3===3;
+      s+=isOffice?win(104+i3*45,585+j3*52,26,34,true,'class="office" stroke="#fff" stroke-width="3"'):win(104+i3*45,585+j3*52,26,34,r()<.55);
+    }
+    s+='</svg>';
+    el.innerHTML=s;
+  });
+
+  /* ---------- floor tracker (top-right of each episode slide) ---------- */
+  var EPS=[3,4,5,6,7,8,9];
+  document.querySelectorAll('.slide[data-ep]').forEach(function(sl){
+    var ep=+sl.dataset.ep, s='<svg viewBox="0 0 154 48">';
+    EPS.forEach(function(e,i){s+='<rect x="'+(i*22)+'" y="2" width="18" height="18" rx="4" fill="'+(e<=ep?'#ffb703':'currentColor')+'" opacity="'+(e<=ep?1:.2)+'" stroke="#0e1230" stroke-width="2.5"/>'});
+    s+='<text x="0" y="42" font-family="Lilita One" font-size="18" letter-spacing="2" fill="currentColor">FLOOR '+ep+' OF 9</text></svg>';
+    var d=document.createElement('div');d.className='floors';d.innerHTML=s;sl.appendChild(d);
+  });
+
+  /* ---------- presentation controller ---------- */
+  var slides=[].slice.call(document.querySelectorAll('.slide')), stage=document.getElementById('deckStage'),
+      counter=document.getElementById('counter'), bar=document.getElementById('bar'), cur=-1, editing=false, steps=[], cs=0;
+
+  function scale(){
+    var f=Math.min(innerWidth/1920,innerHeight/1080), x=(innerWidth-1920*f)/2, y=(innerHeight-1080*f)/2;
+    stage.style.transform='translate('+x+'px,'+y+'px) scale('+f+')';
+  }
+  function countUp(sl){
+    sl.querySelectorAll('.count').forEach(function(c){
+      var to=+c.dataset.to; c.textContent='0';
+      setTimeout(function(){var t0=Date.now(),iv=setInterval(function(){var p=Math.min((Date.now()-t0)/1400,1);c.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p>=1)clearInterval(iv)},30)},700);
+    });
+  }
+  function show(i,atEnd){
+    i=Math.max(0,Math.min(i,slides.length-1)); if(i===cur)return;
+    slides.forEach(function(s){s.classList.remove('active','visible')});
+    cur=i; cs=atEnd?steps[i]:0; var sl=slides[i]; sl.classList.add('active'); applyStep();
+    requestAnimationFrame(function(){requestAnimationFrame(function(){sl.classList.add('visible');countUp(sl)})});
+    updateBar();
+    try{history.replaceState(null,'','#'+(i+1))}catch(e){}
+  }
+  /* build steps: each .st[data-step=n] shows once the step counter reaches n */
+  steps=slides.map(function(s){var m=0;s.querySelectorAll('.st').forEach(function(e){m=Math.max(m,+e.dataset.step)});return m});
+  function applyStep(){slides[cur].querySelectorAll('.st').forEach(function(e){e.classList.toggle('on',+e.dataset.step<=cs)});updateBar()}
+  function updateBar(){
+    counter.textContent=(cur+1)+' / '+slides.length+(steps[cur]?'  ·  step '+cs+'/'+steps[cur]:'');
+    var done=cur+(steps[cur]?cs/(steps[cur]+1):0); bar.style.width=((done+1)/slides.length*100)+'%';
+  }
+  var next=function(){ if(cs<steps[cur]){cs++;applyStep()} else show(cur+1) };
+  var prev=function(){ if(cs>0){cs--;applyStep()} else show(cur-1,true) };
+
+  /* controls fade in on activity, then hide so recordings stay clean */
+  var ctl=document.querySelector('.deck-controls'), ctlT=null;
+  function pokeCtl(){ctl.classList.add('show');clearTimeout(ctlT);ctlT=setTimeout(function(){ctl.classList.remove('show')},2200)}
+  addEventListener('mousemove',pokeCtl); addEventListener('keydown',pokeCtl);
+  addEventListener('resize',scale); scale();
+  addEventListener('keydown',function(e){
+    if(e.target&&e.target.isContentEditable)return;
+    if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].indexOf(e.key)>-1){e.preventDefault();next()}
+    else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].indexOf(e.key)>-1){e.preventDefault();prev()}
+    else if(e.key==='Home')show(0); else if(e.key==='End')show(slides.length-1);
+  });
+  var wheelLock=false;
+  addEventListener('wheel',function(e){if(wheelLock||editing)return;wheelLock=true;setTimeout(function(){wheelLock=false},650);e.deltaY>0?next():prev()},{passive:true});
+  var tx=null;
+  addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+  addEventListener('touchend',function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null},{passive:true});
+
+  /* ---------- inline text editing (hover top-left corner or press E; Ctrl+S saves a copy) ---------- */
+  var EDITABLE='h1,h2,p,.bubble,.lead,.note,.over,.chip,.nm,.cp,.cc,.step,.step2,.jr span,.ln,.rub span,.tile span,.cg span,.cg b,.panel .disp,.panel .hand';
+  var toggle=document.getElementById('editToggle'), hot=document.querySelector('.edit-hotzone'), hideT=null;
+  function setEdit(on){
+    editing=on; document.body.classList.toggle('editing',on); toggle.classList.toggle('active',on);
+    document.querySelectorAll(EDITABLE).forEach(function(el){if(on)el.setAttribute('contenteditable','true');else el.removeAttribute('contenteditable')});
+  }
+  toggle.addEventListener('click',function(){setEdit(!editing)});
+  hot.addEventListener('click',function(){setEdit(!editing)});
+  hot.addEventListener('mouseenter',function(){clearTimeout(hideT);toggle.classList.add('show')});
+  hot.addEventListener('mouseleave',function(){hideT=setTimeout(function(){if(!editing)toggle.classList.remove('show')},400)});
+  toggle.addEventListener('mouseenter',function(){clearTimeout(hideT)});
+  toggle.addEventListener('mouseleave',function(){hideT=setTimeout(function(){if(!editing)toggle.classList.remove('show')},400)});
+  addEventListener('keydown',function(e){
+    if((e.key==='e'||e.key==='E')&&!(e.target&&e.target.isContentEditable)&&!e.ctrlKey&&!e.metaKey){setEdit(!editing)}
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){
+      e.preventDefault(); var was=editing; setEdit(false);
+      var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+      var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download='video4_slides-edited.html'; a.click();
+      if(was)setEdit(true);
+    }
+  });
+
+  var start=parseInt((location.hash||'').slice(1),10); show(isNaN(start)?0:start-1);
+})();
+</script>
+</body>
+</html>
