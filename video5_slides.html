@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video 5 · Two Syntaxes</title>
+<!-- Fonts: Lilita One (comic display), Outfit (body), Patrick Hand (speech bubbles), JetBrains Mono (code) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Outfit:wght@400;600;800&family=Patrick+Hand&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* ===========================================
+   THEME TOKENS  (change these to re-skin the whole deck)
+   =========================================== */
+:root{
+  --ink:#0e1230;          /* outlines + dark text */
+  --night:#0a0f35;
+  --cream:#fff2d1;        /* paper + light text */
+  --amber:#ffb703;        /* hero accent */
+  --scarlet:#ef476f;      /* reject / Ron */
+  --teal:#2ec4b6;         /* Priya / parse */
+  --mint:#06d6a0;         /* strong match / score */
+  --sky:#4cc9f0;          /* Harry / audit trail */
+  --coral:#ff7f50;        /* parallel */
+  --stage-bg:#03051a;
+  --slide-bg:#0a0f35;
+  --f-disp:'Lilita One',sans-serif;
+  --f-body:'Outfit',sans-serif;
+  --f-hand:'Patrick Hand',cursive;
+  --f-mono:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --sh:var(--ink);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* ===========================================
+   FIXED 16:9 STAGE: MANDATORY BASE STYLES
+   (slides are authored at 1920x1080 and scaled as a whole)
+   =========================================== */
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--stage-bg,#000)}
+.deck-viewport{position:fixed;inset:0;overflow:hidden;background:var(--stage-bg,#000)}
+.deck-stage{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;transform-origin:0 0;background:var(--slide-bg,#fff)}
+.slide{position:absolute;inset:0;width:1920px;height:1080px;overflow:hidden;display:block;visibility:hidden;opacity:0;pointer-events:none;background:var(--slide-bg,#fff)}
+.slide.active,.slide.visible{visibility:visible;opacity:1;pointer-events:auto;z-index:1}
+img,video,canvas,svg{max-width:100%;max-height:100%}
+.deck-controls{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:1000}
+@media print{
+  html,body{width:1920px;height:auto;overflow:visible;background:#fff}
+  .deck-viewport{position:static;overflow:visible;background:#fff}
+  .deck-stage{position:static;width:auto;height:auto;transform:none !important;background:none}
+  .slide{position:relative;display:block !important;visibility:visible !important;opacity:1 !important;pointer-events:auto !important;width:1920px;height:1080px;break-after:page;page-break-after:always}
+  .slide:last-child{break-after:auto;page-break-after:auto}
+  .deck-controls{display:none !important}
+}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.2s !important}
+}
+
+/* ===========================================
+   SLIDE FLAVOURS
+   .night = problem / story scenes   .paper = solution / blueprint scenes
+   =========================================== */
+.slide{font-family:var(--f-body);font-size:34px;color:var(--cream)}
+.night{
+  background:
+    radial-gradient(1100px 650px at 80% 28%,rgba(70,86,200,.55) 0%,transparent 62%),
+    linear-gradient(180deg,#060a2a 0%,#0e1556 62%,#1b2370 100%);
+  --sh:var(--amber);
+}
+/* halftone comic dots */
+.night::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.07) 2.5px,transparent 3px);background-size:28px 28px;pointer-events:none}
+.paper{
+  color:var(--ink);background-color:var(--cream);
+  background-image:linear-gradient(rgba(14,18,48,.07) 2px,transparent 2px),linear-gradient(90deg,rgba(14,18,48,.07) 2px,transparent 2px);
+  background-size:60px 60px;--sh:var(--ink);
+}
+.abs{position:absolute}
+
+/* ===========================================
+   REVEAL ANIMATIONS  (trigger when slide gets .visible)
+   =========================================== */
+.reveal{opacity:0;transform:translateY(46px);transition:opacity .7s var(--ease) var(--d,0s),transform .85s var(--ease) var(--d,0s)}
+.reveal.l{transform:translateX(-130px)}
+.reveal.r{transform:translateX(130px)}
+.reveal.pop{transform:scale(.45) rotate(-8deg);transition-timing-function:cubic-bezier(.34,1.56,.64,1)}
+.slide.visible .reveal{opacity:1;transform:none}
+
+/* ===========================================
+   TYPE
+   =========================================== */
+.disp{font-family:var(--f-disp);font-weight:400;letter-spacing:.5px}
+.h1{font-family:var(--f-disp);font-size:196px;line-height:.9;color:var(--cream);text-shadow:9px 9px 0 rgba(0,0,0,.45)}
+.h2{font-family:var(--f-disp);font-size:92px;line-height:1.02;text-shadow:6px 6px 0 rgba(0,0,0,.35)}
+.paper .h2{text-shadow:5px 5px 0 rgba(255,183,3,.7)}
+.over{font-family:var(--f-disp);font-size:34px;letter-spacing:4px;color:var(--amber);text-transform:uppercase}
+.paper .over{color:#c46a00}
+.lead{font-size:42px;line-height:1.3;font-weight:600}
+.hand{font-family:var(--f-hand)}
+.mono{font-family:var(--f-mono);font-weight:700}
+.amber{color:var(--amber)}.mint{color:var(--mint)}.scarlet{color:var(--scarlet)}.teal{color:var(--teal)}.sky{color:var(--sky)}
+
+/* ===========================================
+   CHROME: episode tag, floors tracker
+   =========================================== */
+.tag{position:absolute;left:80px;top:38px;background:var(--amber);color:var(--ink);font-family:var(--f-disp);font-size:36px;letter-spacing:2px;padding:10px 28px 8px;border:5px solid var(--ink);border-radius:14px;box-shadow:6px 6px 0 var(--ink);rotate:-2deg;z-index:5}
+.tag.side{background:var(--cream);border-style:dashed}
+.floors{position:absolute;right:70px;top:40px;width:150px;z-index:5}
+.floors svg{width:150px;height:auto;display:block}
+
+/* ===========================================
+   COMIC PARTS: panel, bubble, portrait, chips
+   =========================================== */
+.panel{background:var(--cream);color:var(--ink);border:6px solid var(--ink);border-radius:26px;box-shadow:14px 14px 0 var(--sh);padding:30px 40px}
+.panel.dark{background:#141b4d;color:var(--cream);border-color:var(--cream)}
+.bubble{position:absolute;background:#fff;color:var(--ink);border:5px solid var(--ink);border-radius:38px;padding:24px 36px;font-family:var(--f-hand);font-size:50px;line-height:1.14;box-shadow:9px 9px 0 rgba(0,0,0,.35);z-index:3}
+.bubble::after{content:"";position:absolute;width:46px;height:46px;background:#fff;border:5px solid var(--ink);border-top:none;border-left:none;transform:rotate(45deg);bottom:-27px;left:80px}
+.bubble.tr::after{left:auto;right:80px}
+.bubble.pl::after{transform:rotate(135deg);left:-28px;top:calc(50% - 23px);bottom:auto}
+.bubble.pl{padding-left:62px}
+.bubble.pr::after{transform:rotate(-45deg);right:-28px;left:auto;top:calc(50% - 23px);bottom:auto}
+.bubble b{color:#d6204e}
+.pf{position:absolute;display:block;aspect-ratio:1;border-radius:50%;border:6px solid var(--ink);background:var(--bgc,#4cc9f0);overflow:hidden;box-shadow:8px 8px 0 rgba(0,0,0,.4);z-index:2}
+.pf.ring{border-color:var(--cream)}
+.pf svg{display:block;width:100%;height:100%;max-width:none;max-height:none}
+.pf.bob{animation:bob 3.4s ease-in-out infinite}
+@keyframes bob{0%,100%{translate:0 0}50%{translate:0 -12px}}
+.chip{display:inline-block;font-family:var(--f-mono);font-weight:700;font-size:28px;padding:10px 24px;border-radius:999px;border:4px solid var(--ink);background:var(--cream);color:var(--ink);box-shadow:5px 5px 0 var(--ink);white-space:nowrap}
+.chip.a{background:var(--amber)}.chip.m{background:var(--mint)}.chip.s{background:var(--sky)}.chip.r{background:var(--scarlet);color:#fff}.chip.t{background:var(--teal)}.chip.c{background:var(--coral)}
+.io{position:absolute;display:flex;align-items:center;gap:22px}
+.io .lbl{font-family:var(--f-disp);font-size:30px;letter-spacing:3px;color:var(--amber)}
+.paper .io .lbl{color:#c46a00}
+.io .arrow{font-family:var(--f-disp);font-size:56px;color:var(--cream)}
+.paper .io .arrow{color:var(--ink)}
+.code{background:#0e1230;color:#ffe9a8;font-family:var(--f-mono);font-weight:500;font-size:27px;line-height:1.55;border-radius:22px;border:6px solid var(--ink);box-shadow:12px 12px 0 var(--amber);padding:26px 34px;white-space:pre}
+.code .k{color:#4cc9f0}.code .c{color:#7e86c9}.code .s{color:#06d6a0}.code .f{color:#ffb703}
+.note{font-family:var(--f-hand);font-size:38px}
+
+/* ===========================================
+   DIAGRAM PARTS
+   =========================================== */
+.n{position:absolute;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--f-mono);font-weight:700;font-size:25px;background:#fff;color:var(--ink);border:5px solid var(--ink);border-radius:18px;box-shadow:6px 6px 0 var(--ink);padding:10px 14px;line-height:1.15}
+.n.pill{border-radius:999px;background:var(--ink);color:var(--cream);box-shadow:6px 6px 0 var(--amber)}
+.n.t{background:var(--teal)}.n.m{background:var(--mint)}.n.s{background:var(--sky)}.n.a{background:var(--amber)}.n.r{background:var(--scarlet);color:#fff}.n.c{background:var(--coral)}
+.dg{position:absolute;overflow:visible}
+.flow{stroke-dasharray:14 12;animation:dash 1s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-26}}
+.arr{font-family:var(--f-disp);font-size:64px;color:var(--ink)}
+.slide .grow{opacity:0;transform:scale(.6);transform-origin:left center;transition:opacity .6s var(--ease) var(--d,0s),transform .7s cubic-bezier(.34,1.56,.64,1) var(--d,0s)}
+.slide.visible .grow{opacity:1;transform:none}
+
+/* score meters */
+.meter{height:34px;border:4px solid var(--ink);border-radius:999px;background:rgba(14,18,48,.18);overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--mint);border-right:4px solid var(--ink);transition:width 1.5s var(--ease) var(--d,.6s)}
+.slide.visible .meter i{width:var(--w)}
+
+/* decorative scenery */
+.stars span{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;opacity:.2;animation:tw 3s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.15;transform:scale(.8)}50%{opacity:.95;transform:scale(1.3)}}
+.moon{position:absolute;width:150px;height:150px;border-radius:50%;box-shadow:inset -38px 8px 0 0 #ffe9a8;filter:drop-shadow(0 0 30px rgba(255,233,168,.55))}
+.skyline{position:absolute;left:0;bottom:0;width:1920px;height:420px;pointer-events:none}
+.skyline svg,.tower svg{max-width:none;max-height:none;display:block}
+.tower{position:absolute}
+.office{animation:office 1.8s ease-in-out infinite}
+@keyframes office{0%,100%{filter:drop-shadow(0 0 4px #ffd166)}50%{filter:drop-shadow(0 0 22px #ffd166)}}
+.beacon{animation:blink 1.4s steps(2,end) infinite}
+@keyframes blink{50%{opacity:.1}}
+.sign{filter:drop-shadow(0 0 10px #ffb703)}
+
+/* deck controls (outside the stage design) */
+.deck-controls{display:flex;align-items:center;gap:16px;font-family:'Outfit',sans-serif;font-size:14px;color:#fff;opacity:0;transition:opacity .4s}
+.deck-controls.show{opacity:.75}
+.progress{width:220px;height:6px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:#ffb703;transition:width .4s}
+
+/* ---- BUILD STEPS: elements with class .st + data-step="n" appear on the n-th key press ---- */
+.st{opacity:0;transform:translateY(46px);pointer-events:none;transition:opacity .6s var(--ease) var(--d,0s),transform .8s var(--ease) var(--d,0s)}
+.st.l{transform:translateX(-130px)}
+.st.r{transform:translateX(130px)}
+.st.pop{transform:scale(.45) rotate(-8deg);transition-timing-function:cubic-bezier(.34,1.56,.64,1)}
+.st.on{opacity:1;transform:none;pointer-events:auto}
+@media print{.st{opacity:1 !important;transform:none !important}}
+</style>
+</head>
+<body>
+<!-- ===========================================
+     SHARED SVG DEFS: arrowheads + the four hand-drawn faces + expressions
+     Faces are drawn on a 200x220 grid; <i class="pf" data-who=".." data-ex=".."> pulls them in via JS.
+     =========================================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+  <marker id="ah-ink" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0e1230"/></marker>
+  <marker id="ah-amber" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ffb703"/></marker>
+  <marker id="ah-cream" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#fff2d1"/></marker>
+  <marker id="ah-scarlet" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ef476f"/></marker>
+  <marker id="ah-coral" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ff7f50"/></marker>
+
+  <!-- shared head: neck, ears, face, cheeks, eyes, nose. Skin colour comes from --skin -->
+  <g id="head">
+    <rect x="84" y="136" width="32" height="42" rx="12" style="fill:var(--skin)"/>
+    <rect x="84" y="152" width="32" height="26" rx="10" fill="#000" opacity=".12"/>
+    <circle cx="49" cy="108" r="10" style="fill:var(--skin)"/><circle cx="151" cy="108" r="10" style="fill:var(--skin)"/>
+    <ellipse cx="100" cy="100" rx="52" ry="58" style="fill:var(--skin)"/>
+    <circle cx="68" cy="124" r="9" fill="#ff7b9c" opacity=".3"/><circle cx="132" cy="124" r="9" fill="#ff7b9c" opacity=".3"/>
+    <ellipse cx="80" cy="102" rx="7" ry="8.5" fill="#14122b"/><ellipse cx="120" cy="102" rx="7" ry="8.5" fill="#14122b"/>
+    <circle cx="82.5" cy="98.5" r="2.6" fill="#fff"/><circle cx="122.5" cy="98.5" r="2.6" fill="#fff"/>
+    <path d="M97 112 Q100 118 103 112" stroke="#000" stroke-opacity=".25" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- PRIYA: recruiter. Teal blazer, long dark hair, hoop earrings, ID lanyard -->
+  <g id="priya">
+    <path d="M44 104 C34 28 166 28 156 104 C160 150 156 188 146 206 L54 206 C44 188 40 150 44 104Z" fill="#17101f"/>
+    <path d="M12 222 C12 182 52 164 100 164 C148 164 188 182 188 222Z" fill="#1c9a94"/>
+    <path d="M78 166 L100 198 L122 166Z" fill="#fff"/>
+    <path d="M78 166 L100 198 L84 216 L56 182Z" fill="#157a76"/><path d="M122 166 L100 198 L116 216 L144 182Z" fill="#157a76"/>
+    <path d="M88 166 L100 200 L112 166" stroke="#ef476f" stroke-width="5" fill="none"/>
+    <rect x="89" y="198" width="22" height="18" rx="3" fill="#fff" stroke="#0e1230" stroke-width="2.5"/>
+    <use href="#head" style="--skin:#c98a5e"/>
+    <path d="M47 104 C44 54 84 34 116 40 C150 46 158 76 153 104 C146 86 132 74 112 68 C88 62 62 78 47 104Z" fill="#17101f"/>
+    <path d="M70 58 Q96 46 122 56" stroke="#5b4a7a" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/>
+    <circle cx="47" cy="126" r="6" fill="none" stroke="#ffb703" stroke-width="3.5"/><circle cx="153" cy="126" r="6" fill="none" stroke="#ffb703" stroke-width="3.5"/>
+  </g>
+
+  <!-- HERMIONE: bushy brown hair, burgundy sweater, gold-striped tie -->
+  <g id="hermione">
+    <g fill="#7a4a24">
+      <circle cx="100" cy="34" r="34"/><circle cx="62" cy="46" r="28"/><circle cx="138" cy="46" r="28"/>
+      <circle cx="40" cy="78" r="26"/><circle cx="160" cy="78" r="26"/><circle cx="30" cy="116" r="24"/><circle cx="170" cy="116" r="24"/>
+      <circle cx="36" cy="150" r="22"/><circle cx="164" cy="150" r="22"/><circle cx="48" cy="180" r="20"/><circle cx="152" cy="180" r="20"/>
+    </g>
+    <path d="M12 222 C12 182 52 164 100 164 C148 164 188 182 188 222Z" fill="#8f1d35"/>
+    <path d="M80 166 L100 192 L120 166Z" fill="#fff"/>
+    <path d="M94 190 L106 190 L110 222 L100 226 L90 222Z" fill="#ffb703"/>
+    <path d="M92 202 L108 202 M91 212 L109 212" stroke="#8f1d35" stroke-width="4"/>
+    <use href="#head" style="--skin:#e9b98f"/>
+    <path d="M50 100 C46 58 82 40 110 44 C142 46 154 70 150 100 C140 80 124 70 104 68 C82 66 62 78 50 100Z" fill="#7a4a24"/>
+    <path d="M62 58 Q84 44 110 48" stroke="#a96d38" stroke-width="7" fill="none" stroke-linecap="round" opacity=".85"/>
+    <circle cx="34" cy="96" r="6" fill="#a96d38" opacity=".7"/><circle cx="166" cy="92" r="6" fill="#a96d38" opacity=".7"/>
+  </g>
+
+  <!-- HARRY: round glasses, messy black hair, lightning scar, red-and-gold tie -->
+  <g id="harry">
+    <path d="M12 222 C12 182 52 164 100 164 C148 164 188 182 188 222Z" fill="#2b2f57"/>
+    <path d="M80 166 L100 190 L120 166Z" fill="#fff"/>
+    <path d="M95 188 L105 188 L108 220 L100 224 L92 220Z" fill="#c8102e"/>
+    <path d="M93 200 L107 200 M92 210 L108 210" stroke="#ffb703" stroke-width="4"/>
+    <use href="#head" style="--skin:#f3cba2"/>
+    <path d="M48 104 C40 56 66 32 100 34 C134 32 160 56 152 104 L146 80 L136 96 L128 68 L116 88 L104 62 L92 86 L80 64 L72 90 L60 70Z" fill="#17101f"/>
+    <path d="M106 68 L100 79 L106 79 L99 91" stroke="#d62839" stroke-width="3.6" fill="none" stroke-linejoin="miter"/>
+    <g fill="rgba(255,255,255,.18)" stroke="#2a1d12" stroke-width="5"><circle cx="80" cy="102" r="17"/><circle cx="120" cy="102" r="17"/></g>
+    <path d="M97 100 Q100 95 103 100 M63 99 L52 97 M137 99 L148 97" stroke="#2a1d12" stroke-width="4" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- RON: fiery red hair, freckles, rust sweater -->
+  <g id="ron">
+    <path d="M12 222 C12 182 52 164 100 164 C148 164 188 182 188 222Z" fill="#b23a48"/>
+    <path d="M22 206 C60 190 140 190 178 206" stroke="#ffb703" stroke-width="7" fill="none"/>
+    <use href="#head" style="--skin:#f7d6b8"/>
+    <path d="M46 104 C36 48 70 30 102 32 C134 30 166 48 154 104 C150 86 142 74 128 70 C118 80 84 80 72 70 C58 74 50 88 46 104Z" fill="#d9531e"/>
+    <circle cx="70" cy="42" r="14" fill="#d9531e"/><circle cx="104" cy="30" r="16" fill="#d9531e"/><circle cx="136" cy="44" r="14" fill="#d9531e"/>
+    <path d="M70 46 Q96 34 126 46" stroke="#f08a4b" stroke-width="6" fill="none" stroke-linecap="round" opacity=".85"/>
+    <g fill="#b9794f" opacity=".85"><circle cx="66" cy="116" r="2.2"/><circle cx="74" cy="122" r="2.2"/><circle cx="62" cy="124" r="2.2"/><circle cx="134" cy="116" r="2.2"/><circle cx="126" cy="122" r="2.2"/><circle cx="138" cy="124" r="2.2"/><circle cx="96" cy="108" r="2"/><circle cx="104" cy="108" r="2"/></g>
+  </g>
+
+  <!-- EXPRESSIONS: brows + mouth, drawn over any face -->
+  <g id="ex-happy" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M66 82 Q80 73 94 81"/><path d="M106 81 Q120 73 134 82"/>
+    <path d="M76 126 Q100 156 124 126Z" fill="#7a1f2b" stroke-width="4"/><path d="M86 136 Q100 146 114 136" stroke="#ff8fa3" stroke-width="5"/>
+  </g>
+  <g id="ex-smug" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M66 84 Q80 80 94 84"/><path d="M106 76 Q120 70 134 78"/>
+    <path d="M80 132 Q106 144 124 126"/>
+  </g>
+  <g id="ex-neutral" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M68 83 H92"/><path d="M108 83 H132"/><path d="M86 134 H114"/>
+  </g>
+  <g id="ex-worried" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M66 87 L94 76"/><path d="M106 76 L134 87"/>
+    <path d="M82 136 Q91 128 100 135 Q109 142 118 134"/>
+    <path d="M142 70 Q150 82 142 90 Q134 82 142 70Z" fill="#9be4ff" stroke="#14122b" stroke-width="2.5"/>
+  </g>
+  <g id="ex-sad" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M64 90 L94 76"/><path d="M106 76 L136 90"/>
+    <path d="M82 140 Q100 122 118 140"/>
+    <path d="M72 116 Q80 130 72 138 Q64 130 72 116Z" fill="#9be4ff" stroke="#14122b" stroke-width="2.5"/>
+  </g>
+  <g id="ex-wow" stroke="#14122b" stroke-width="5" stroke-linecap="round" fill="none">
+    <path d="M66 76 Q80 66 94 76"/><path d="M106 76 Q120 66 134 76"/>
+    <ellipse cx="100" cy="136" rx="10" ry="13" fill="#7a1f2b" stroke-width="4"/>
+  </g>
+</defs>
+</svg>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage">
+<!-- ============ 1: AGENDA ============ -->
+<section class="slide night" data-title="Ep 5 intro">
+  <div class="stars abs" data-n="50" data-h="500" style="inset:0"></div>
+  <div class="moon abs" style="left:1650px;top:60px;width:120px;height:120px"></div>
+  <div class="skyline" data-seed="23" style="opacity:.9"></div>
+  <div class="tag reveal">EPISODE 5 · TWO SYNTAXES</div>
+  <div class="over abs reveal" style="left:110px;top:150px;--d:.2s">Today's episode</div>
+  <div class="h2 abs reveal" style="left:110px;top:205px;width:1500px;--d:.35s">Here's what we'll talk about</div>
+
+  <div class="intro-row st" data-step="1" style="top:330px;--d:0s"><i>1</i><span>Is the <b class="amber">Functional API</b> a <b class="amber">different library</b>?</span></div>
+  <div class="intro-row st" data-step="2" style="top:438px;--d:0s"><i>2</i><span>The <b class="amber">Graph API</b> pipeline, as a reminder</span></div>
+  <div class="intro-row st" data-step="3" style="top:546px;--d:0s"><i>3</i><span>The same pipeline with <b class="amber">@entrypoint</b> and <b class="amber">@task</b></span></div>
+  <div class="intro-row st" data-step="4" style="top:654px;--d:0s"><i>4</i><span>Confirming the <b class="amber">output is identical</b></span></div>
+  <div class="intro-row st" data-step="5" style="top:762px;--d:0s"><i>5</i><span>What's <b class="amber">gained</b>, what's <b class="amber">lost</b></span></div>
+  <div class="intro-row st" data-step="6" style="top:870px;--d:0s"><i>6</i><span><b class="amber">Decision guide</b>: why we stay on the Graph API</span></div>
+
+  <i class="pf ring st pop bob" data-step="1" data-who="harry" data-ex="neutral" style="left:1560px;top:520px;width:270px;--bgc:#4cc9f0;--d:0.2s"></i>
+  <style>
+    .intro-row{position:absolute;left:110px;width:1340px;height:96px;display:flex;align-items:center;gap:26px;padding:0 34px 0 22px;font-size:35px;font-weight:600;line-height:1.15;background:#141b4d;color:var(--cream);border:5px solid var(--cream);border-radius:24px;box-shadow:9px 9px 0 var(--amber);z-index:2}
+    .intro-row i{flex:none;width:60px;height:60px;border-radius:50%;background:var(--amber);color:var(--ink);border:4px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-style:normal;font-size:36px}
+  </style>
+</section>
+
+<!-- ============ 2: THE CONFUSION ============ -->
+<section class="slide night" data-ep="5" data-title="The confusion">
+  <div class="stars abs" data-n="40" data-h="400" style="inset:0"></div>
+  <div class="tag reveal">EPISODE 5 · THE QUESTION</div>
+  <div class="over abs reveal" style="left:110px;top:150px;--d:.2s">You'll run into this</div>
+  <div class="h2 abs reveal" style="left:110px;top:205px;width:1500px;--d:.35s">Same library, or a different one?</div>
+
+  <div class="code abs st l" data-step="1" style="left:110px;top:420px;width:960px;height:300px;font-size:30px;--d:0s"><span class="f">@task</span>
+<span class="k">def</span> <span class="f">parse_resume_task</span>(text): ...
+
+<span class="f">@entrypoint</span>()
+<span class="k">def</span> <span class="f">screener_workflow</span>(text): ...</div>
+
+  <i class="pf ring st pop" data-step="2" data-who="harry" data-ex="worried" style="left:1200px;top:400px;width:220px;--bgc:#4cc9f0;--d:0s"></i>
+  <div class="bubble pl st" data-step="2" style="left:1440px;top:420px;width:400px;font-size:44px;--d:0.2s">No <b>StateGraph</b>? Is this another library?</div>
+
+  <div class="panel abs st pop" data-step="3" style="left:110px;top:790px;width:1700px;height:130px;padding:18px 34px;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:600;--d:0s">Answer: <b>same engine</b>, different <b>surface syntax</b>.</div>
+  <div class="abs st" data-step="4" style="left:110px;top:965px;display:flex;gap:18px;--d:0s"><span class="chip">LangGraph</span><span class="chip a">@entrypoint / @task</span><span class="chip s">not a new library</span></div>
+</section>
+
+<!-- ============ 3: GRAPH API RECAP ============ -->
+<section class="slide paper" data-ep="5" data-title="Graph API recap">
+  <div class="tag reveal">EPISODE 5 · THE GRAPH API</div>
+  <div class="h2 abs reveal" style="left:110px;top:116px;font-size:84px;--d:.15s">The Video 4 pipeline</div>
+
+  <div class="n pill st" data-step="1" style="left:110px;top:290px;width:150px;height:110px;--d:0s">START</div>
+  <span class="abs arr st" data-step="1" style="left:270px;top:296px;--d:0.1s">→</span>
+  <div class="n t st pop" data-step="1" style="left:340px;top:290px;width:330px;height:110px;font-size:28px;--d:0.2s">parse_resume</div>
+  <span class="abs arr st" data-step="1" style="left:688px;top:296px;--d:0.3s">→</span>
+  <div class="n m st pop" data-step="1" style="left:760px;top:290px;width:330px;height:110px;font-size:23px;--d:0.4s">score_against_<br>rubric</div>
+  <span class="abs arr st" data-step="1" style="left:1108px;top:296px;--d:0.5s">→</span>
+  <div class="n a st pop" data-step="1" style="left:1180px;top:290px;width:330px;height:110px;font-size:26px;--d:0.6s">generate_summary</div>
+  <span class="abs arr st" data-step="1" style="left:1528px;top:296px;--d:0.7s">→</span>
+  <div class="n pill st" data-step="1" style="left:1600px;top:290px;width:130px;height:110px;--d:0.8s">END</div>
+
+  <div class="step st" data-step="2" style="left:110px;top:480px;--d:0s"><i>1</i><span>An explicit <b>state schema</b> (<b>TypedDict</b>)</span></div>
+  <div class="step st" data-step="3" style="left:690px;top:480px;--d:0s"><i>2</i><span>Nodes return <b>partial updates</b></span></div>
+  <div class="step st" data-step="4" style="left:1270px;top:480px;--d:0s"><i>3</i><span>Edges declared <b>separately</b> from the logic</span></div>
+
+  <div class="code abs st l" data-step="5" style="left:110px;top:680px;width:1100px;height:210px;font-size:27px;--d:0s">builder = StateGraph(ScreenerState)
+builder.add_node(<span class="s">"parse_resume"</span>, parse_resume)
+builder.add_edge(START, <span class="s">"parse_resume"</span>)
+graph = builder.compile()</div>
+  <div class="panel abs st pop" data-step="6" style="left:1290px;top:680px;width:520px;height:210px;background:var(--amber);padding:24px 30px;font-size:34px;font-weight:600;line-height:1.3;--d:0s">In return: a <b>picture</b> of the pipeline for free.</div>
+  <style>
+    .step{position:absolute;width:540px;height:140px;display:flex;align-items:center;gap:20px;padding:0 26px 0 20px;font-size:31px;font-weight:600;line-height:1.2;background:#fff;color:var(--ink);border:5px solid var(--ink);border-radius:22px;box-shadow:8px 8px 0 var(--amber)}
+    .step i{flex:none;width:64px;height:64px;border-radius:50%;background:var(--amber);border:4px solid var(--ink);display:flex;align-items:center;justify-content:center;font-family:var(--f-disp);font-style:normal;font-size:38px}
+  </style>
+</section>
+
+<!-- ============ 4: SAME ENGINE ============ -->
+<section class="slide paper" data-ep="5" data-title="Same engine">
+  <div class="tag reveal">EPISODE 5 · UNDER THE HOOD</div>
+  <div class="h2 abs reveal" style="left:110px;top:116px;font-size:84px;--d:.15s">Two surfaces, one engine.</div>
+
+  <div class="panel abs st l" data-step="1" style="left:110px;top:290px;width:640px;height:230px;--d:0s"><div class="over" style="font-size:28px;margin-bottom:12px">GRAPH API</div><div class="mono" style="font-size:30px;line-height:1.5">StateGraph<br>add_node · add_edge</div></div>
+  <div class="panel abs st r" data-step="2" style="left:1170px;top:290px;width:640px;height:230px;border-style:dashed;background:#fbf4e2;--d:0s"><div class="over" style="font-size:28px;margin-bottom:12px">FUNCTIONAL API</div><div class="mono" style="font-size:30px;line-height:1.5">@entrypoint<br>@task</div></div>
+
+  <svg class="dg st" data-step="3" style="left:0;top:0;width:1920px;height:1080px;--d:0.2s" viewBox="0 0 1920 1080">
+    <g stroke="#0e1230" stroke-width="5" fill="none" marker-end="url(#ah-ink)">
+      <path d="M430 520 C430 590 800 560 860 640"/><path d="M1490 520 C1490 590 1120 560 1060 640"/>
+    </g>
+  </svg>
+  <div class="n a st pop" data-step="3" style="left:700px;top:650px;width:520px;height:120px;font-size:32px;--d:0s">the same runtime<br><span style="font-size:24px">(Pregel)</span></div>
+
+  <div class="step st" data-step="4" style="left:110px;top:830px;width:830px;height:110px;--d:0s"><i>1</i><span>Both compile to the <b>same type</b>: <b>.invoke · .stream · .batch</b></span></div>
+  <div class="step st" data-step="5" style="left:980px;top:830px;width:830px;height:110px;--d:0s"><i>2</i><span>Same <b>checkpointing</b> underneath <b>(Video 14)</b></span></div>
+  <div class="abs st" data-step="6" style="left:110px;top:985px;display:flex;gap:18px;--d:0s"><span class="chip">same engine</span><span class="chip a">different surface syntax</span></div>
+</section>
+
+<!-- ============ 5: SIDE BY SIDE CODE ============ -->
+<section class="slide paper" data-ep="5" data-title="Side by side">
+  <div class="tag reveal">EPISODE 5 · SIDE BY SIDE</div>
+  <div class="h2 abs reveal" style="left:110px;top:116px;font-size:84px;--d:.15s">Same pipeline, ordinary Python.</div>
+
+  <div class="over abs st" data-step="1" style="left:110px;top:270px;font-size:26px;--d:0s">GRAPH API · schema + nodes + edges</div>
+  <div class="code abs st l" data-step="1" style="left:110px;top:315px;width:830px;height:420px;font-size:24px;--d:0s"><span class="k">class</span> ScreenerState(TypedDict):
+    resume_text: <span class="k">str</span>
+    candidate_name: <span class="k">str</span>
+    ... <span class="c"># 8 fields</span>
+
+builder.add_node(<span class="s">"parse_resume"</span>, ...)
+builder.add_node(<span class="s">"score_..."</span>, ...)
+builder.add_node(<span class="s">"generate_summary"</span>, ...)
+builder.add_edge(START, <span class="s">"parse_resume"</span>)
+builder.add_edge(<span class="s">"parse_resume"</span>, <span class="s">"score_..."</span>)
+...</div>
+
+  <div class="over abs st" data-step="2" style="left:980px;top:270px;font-size:26px;--d:0s">FUNCTIONAL API · one function</div>
+  <div class="code abs st r" data-step="2" style="left:980px;top:315px;width:830px;height:420px;font-size:24px;--d:0s"><span class="f">@entrypoint</span>()
+<span class="k">def</span> <span class="f">screener_workflow</span>(resume_text):
+    parsed = parse_resume_task(
+        resume_text).result()
+    scored = score_against_rubric_task(
+        parsed[<span class="s">"candidate_name"</span>], ...).result()
+    summary = generate_summary_task(
+        ...).result()
+    <span class="k">return</span> {**parsed, **scored,
+            <span class="s">"summary"</span>: summary}</div>
+
+  <div class="panel abs st pop" data-step="3" style="left:110px;top:790px;width:1700px;height:110px;padding:20px 34px;background:var(--amber);text-align:center;font-size:36px;font-weight:600;--d:0s">Same <b>three steps</b>, same <b>prompts</b>, same <b>call_llm</b>.</div>
+  <div class="abs st" data-step="4" style="left:110px;top:965px;display:flex;gap:18px;--d:0s"><span class="chip">one @task per step</span><span class="chip a">@entrypoint = the pipeline</span></div>
+</section>
+
+<!-- ============ 6: WHAT CHANGES ============ -->
+<section class="slide paper" data-ep="5" data-title="What changes">
+  <div class="tag reveal">EPISODE 5 · WHAT CHANGES</div>
+  <div class="h2 abs reveal" style="left:110px;top:116px;font-size:84px;--d:.15s">Four things look different.</div>
+
+  <div class="cardio st" data-step="1" style="left:110px;--d:0s"><b>No state schema</b>data flows through function <i>arguments</i> and <i>return values</i></div>
+  <div class="cardio st" data-step="2" style="left:690px;--d:0s"><b>No edges</b>control flow is just calling one task <i>after another</i></div>
+  <div class="cardio st" data-step="3" style="left:1270px;--d:0s"><b>Futures</b>tasks return a future, so call <i>.result()</i> to wait</div>
+  <div class="cardio st" data-step="4" style="left:110px;top:590px;width:830px;--d:0s"><b>No static graph</b>the "graph" only exists at runtime, inferred from which <i>tasks got called</i></div>
+  <div class="panel abs st pop" data-step="5" style="left:980px;top:590px;width:830px;height:250px;background:var(--amber);padding:26px 30px;--d:0s"><div class="over" style="font-size:26px;margin-bottom:10px;color:var(--ink)">STATE FLAVOUR</div><div style="font-size:32px;font-weight:600;line-height:1.3">Arguments, return values and <b>closures</b>, not one shared state object you can inspect.</div></div>
+  <style>
+    .cardio{position:absolute;top:290px;width:540px;height:260px;padding:22px 26px;background:#fff;border:5px solid var(--ink);border-radius:20px;box-shadow:8px 8px 0 var(--amber);font-size:30px;font-weight:600;line-height:1.35}
+    .cardio b{display:block;font-family:var(--f-mono);font-size:26px;margin-bottom:12px;padding-bottom:10px;border-bottom:4px dashed var(--ink)}
+    .cardio i{font-family:var(--f-mono);font-style:normal;font-size:26px;background:rgba(255,183,3,.35);padding:0 6px;border-radius:6px}
+  </style>
+  <div class="abs st" data-step="6" style="left:110px;top:900px;display:flex;gap:18px;--d:0s"><span class="chip">less ceremony</span><span class="chip a">less structure</span></div>
+</section>
+
+<!-- ============ 7: IDENTICAL OUTPUT ============ -->
+<section class="slide paper" data-ep="5" data-title="Identical output">
+  <div class="tag reveal">EPISODE 5 · THE CHECK</div>
+  <div class="h2 abs reveal" style="left:110px;top:112px;font-size:80px;--d:.15s">Three candidates, both APIs.</div>
+
+  <div class="rc st" data-step="1" style="left:110px;--sh:#ffb703;--d:0s"><i class="pf" data-who="hermione" data-ex="happy" style="left:20px;top:46px;width:150px;--bgc:#ffb703;box-shadow:none"></i><div class="in"><div class="disp" style="font-size:44px">Hermione</div><div class="dec" style="background:var(--mint)">graph = func</div></div></div>
+  <div class="rc st" data-step="2" style="left:690px;--sh:#4cc9f0;--d:0s"><i class="pf" data-who="harry" data-ex="neutral" style="left:20px;top:46px;width:150px;--bgc:#4cc9f0;box-shadow:none"></i><div class="in"><div class="disp" style="font-size:44px">Harry</div><div class="dec" style="background:var(--mint)">graph = func</div></div></div>
+  <div class="rc st" data-step="3" style="left:1270px;--sh:#ef476f;--d:0s"><i class="pf" data-who="ron" data-ex="sad" style="left:20px;top:46px;width:150px;--bgc:#ef476f;box-shadow:none"></i><div class="in"><div class="disp" style="font-size:44px">Ron</div><div class="dec" style="background:var(--mint)">graph = func</div></div></div>
+
+  <div class="panel abs st" data-step="4" style="left:110px;top:560px;width:830px;height:240px;--d:0s"><div class="over" style="font-size:26px;margin-bottom:10px">SEVEN FIELDS COMPARED</div><div class="mono" style="font-size:25px;line-height:1.5;font-weight:500">candidate_name · years_experience<br>skills · leadership · score<br>score_rationale · summary</div></div>
+  <div class="panel abs st" data-step="5" style="left:980px;top:560px;width:830px;height:240px;border-style:dashed;background:#fbf4e2;--d:0s"><div class="over" style="font-size:26px;margin-bottom:10px">ONE CAVEAT</div><div style="font-size:30px;font-weight:600;line-height:1.3">Both call the same <b>non-deterministic LLM</b>, so <b>wording</b> can vary between runs. The <b>behavior</b> is identical.</div></div>
+  <div class="abs st" data-step="6" style="left:110px;top:870px;display:flex;gap:18px;--d:0s"><span class="chip">isinstance(…, Pregel)</span><span class="chip a">both → True</span></div>
+  <style>
+    .rc{position:absolute;top:290px;width:540px;height:230px;background:#fff;border:6px solid var(--ink);border-radius:24px;box-shadow:10px 10px 0 var(--sh)}
+    .rc .in{position:absolute;left:200px;top:34px;right:26px}
+    .dec{margin-top:22px;font-family:var(--f-mono);font-weight:700;font-size:30px;padding:14px 20px;border:4px solid var(--ink);border-radius:16px;text-align:center}
+  </style>
+</section>
+
+<!-- ============ 8: GAINED / LOST ============ -->
+<section class="slide paper" data-ep="5" data-title="Gained and lost">
+  <div class="tag reveal">EPISODE 5 · THE TRADEOFF</div>
+  <div class="h2 abs reveal" style="left:110px;top:116px;font-size:84px;--d:.15s">What's gained, what's lost.</div>
+
+  <div class="panel abs st l" data-step="1" style="left:110px;top:280px;width:830px;height:600px;--d:0s">
+    <div class="over" style="font-size:30px;margin-bottom:18px;color:#04a07a">GAINED · FUNCTIONAL API</div>
+    <div class="gl st" data-step="2" style="--d:0s">Less <b>boilerplate</b>: no schema class, no add_edge</div>
+    <div class="gl st" data-step="3" style="--d:0s">Reads like <b>ordinary sequential Python</b></div>
+    <div class="gl st" data-step="4" style="--d:0s">Lower barrier for teammates new to the <b>Graph API</b></div>
+  </div>
+  <div class="panel abs st r" data-step="5" style="left:980px;top:280px;width:830px;height:600px;border-style:dashed;background:#fbf4e2;--d:0s">
+    <div class="over" style="font-size:30px;margin-bottom:18px;color:#d6204e">LOST, OR HARDER</div>
+    <div class="gl st" data-step="6" style="--d:0s">No <b>show_graph</b> picture until the code runs</div>
+    <div class="gl st" data-step="7" style="--d:0s"><b>Routing</b> and <b>parallel fan-out</b> get messier in a function body</div>
+    <div class="gl st" data-step="8" style="--d:0s">No <b>single state object</b> to inspect at any point</div>
+  </div>
+  <style>
+    .gl{font-size:32px;font-weight:600;line-height:1.3;padding:18px 22px;margin-bottom:18px;background:#fff;border:4px solid var(--ink);border-radius:18px}
+  </style>
+  <div class="abs st" data-step="9" style="left:110px;top:940px;display:flex;gap:18px;--d:0s"><span class="chip">same checkpointing either way</span><span class="chip a">depth in Video 14</span></div>
+</section>
+
+<!-- ============ 9: DECISION GUIDE ============ -->
+<section class="slide paper" data-ep="5" data-title="Decision guide">
+  <div class="tag reveal">EPISODE 5 · WHICH ONE?</div>
+  <div class="h2 abs reveal" style="left:110px;top:112px;font-size:80px;--d:.15s">Pick by what you need.</div>
+
+  <div class="cmp-h st" data-step="1" style="--d:0s"><div class="c1">If you need…</div><div class="c2">Pick</div></div>
+  <div class="cmp-r st" data-step="2" style="top:400px;--d:0s"><div>A diagram of the workflow (docs, debugging)</div><div class="g">Graph API</div></div>
+  <div class="cmp-r st" data-step="3" style="top:520px;--d:0s"><div>Branching, looping, parallel, subgraphs, multi-agent</div><div class="g">Graph API</div></div>
+  <div class="cmp-r st" data-step="4" style="top:640px;--d:0s"><div>Fine-grained control over routing</div><div class="g">Graph API</div></div>
+  <div class="cmp-r st" data-step="5" style="top:760px;--d:0s"><div>A straightforward, mostly-linear pipeline, minimal ceremony</div><div class="f">Functional API</div></div>
+  <div class="cmp-r st" data-step="6" style="top:880px;--d:0s"><div>Graph-style persistence for an existing linear script, fast</div><div class="f">Functional API</div></div>
+  <style>
+    .cmp-h,.cmp-r{position:absolute;left:110px;width:1700px;display:flex;gap:20px}
+    .cmp-h{top:290px;height:90px}
+    .cmp-r{height:100px}
+    .cmp-h div,.cmp-r div{padding:14px 28px;border:5px solid var(--ink);border-radius:20px;background:#fff;font-size:30px;font-weight:600;line-height:1.2;display:flex;align-items:center}
+    .cmp-h div,.cmp-r div:first-child{flex:2.2}
+    .cmp-h .c2,.cmp-r div:last-child{flex:1;justify-content:center;font-family:var(--f-disp);font-weight:400;font-size:34px}
+    .cmp-h .c1{background:var(--sky);font-family:var(--f-disp);font-weight:400;font-size:34px;box-shadow:6px 6px 0 var(--ink)}
+    .cmp-h .c2{background:var(--amber);box-shadow:6px 6px 0 var(--ink)}
+    .cmp-r .g{background:var(--sky)}
+    .cmp-r .f{background:var(--mint)}
+  </style>
+</section>
+
+<!-- ============ 10: RULE OF THUMB + COMMITMENT ============ -->
+<section class="slide night" data-ep="5" data-title="Rule of thumb">
+  <div class="stars abs" data-n="40" data-h="400" style="inset:0"></div>
+  <div class="tag reveal">EPISODE 5 · THE RULE</div>
+  <div class="over abs reveal" style="left:110px;top:150px;--d:.2s">Rule of thumb</div>
+  <div class="h2 abs reveal" style="left:110px;top:205px;width:1500px;--d:.35s">Boxes and arrows, or a script?</div>
+
+  <div class="panel abs st l" data-step="1" style="left:110px;top:400px;width:830px;height:250px;--sh:var(--amber);--d:0s"><div class="over" style="font-size:28px;margin-bottom:12px;color:#c46a00">SKETCHING BOXES + ARROWS</div><div class="disp" style="font-size:70px;line-height:1">Graph API</div></div>
+  <div class="panel abs st r" data-step="2" style="left:980px;top:400px;width:830px;height:250px;--sh:var(--mint);--d:0s"><div class="over" style="font-size:28px;margin-bottom:12px;color:#c46a00">NARRATING A SCRIPT, TOP TO BOTTOM</div><div class="disp" style="font-size:70px;line-height:1">Functional API</div></div>
+
+  <div class="panel abs st pop" data-step="3" style="left:110px;top:730px;width:1700px;height:200px;background:var(--amber);color:var(--ink);padding:26px 40px;--sh:var(--cream);--d:0s">
+    <div class="over" style="font-size:28px;margin-bottom:10px;color:var(--ink)">FROM HERE ON</div>
+    <div style="font-size:40px;font-weight:600;line-height:1.25">This course uses the <b>Graph API only</b>. Conditional edges, loops, parallelism, subgraphs and multi-agent are all <b>Graph-API-native</b>.</div>
+  </div>
+  <div class="abs st" data-step="4" style="left:110px;top:965px;display:flex;gap:18px;--d:0s"><span class="chip">no @entrypoint later</span><span class="chip a">this was the one dedicated comparison</span></div>
+</section>
+
+<!-- ============ 11: RECAP + NEXT ============ -->
+<section class="slide night" data-ep="5" data-title="Recap + next">
+  <div class="stars abs" data-n="40" data-h="400" style="inset:0"></div>
+  <div class="tag reveal">EPISODE 5 · RECAP</div>
+  <div class="h2 abs reveal" style="left:110px;top:140px;--d:.2s">What we <span class="amber">locked in</span></div>
+
+  <div class="intro-row st" data-step="1" style="top:330px;--d:0s"><i>1</i><span>Same <b class="amber">engine</b>, two <b class="amber">surface syntaxes</b></span></div>
+  <div class="intro-row st" data-step="2" style="top:440px;--d:0s"><i>2</i><span><b class="amber">@task</b> per step, <b class="amber">@entrypoint</b> for the pipeline</span></div>
+  <div class="intro-row st" data-step="3" style="top:550px;--d:0s"><i>3</i><span>Less boilerplate, but <b class="amber">no picture</b> and <b class="amber">less routing control</b></span></div>
+  <div class="intro-row st" data-step="4" style="top:660px;--d:0s"><i>4</i><span>Linear and simple → <b class="amber">Functional</b>. Anything richer → <b class="amber">Graph</b></span></div>
+  <div class="intro-row st" data-step="5" style="top:770px;--d:0s"><i>5</i><span>The rest of the course stays on the <b class="amber">Graph API</b></span></div>
+
+  <i class="pf ring st pop bob" data-step="5" data-who="harry" data-ex="happy" style="left:1560px;top:470px;width:270px;--bgc:#4cc9f0;--d:0.2s"></i>
+
+  <div class="panel abs st pop" data-step="6" style="left:110px;top:910px;width:1700px;height:120px;padding:18px 34px;background:var(--amber);display:flex;align-items:center;gap:30px;--sh:var(--cream);--d:0s">
+    <span class="disp" style="font-size:44px;white-space:nowrap">NEXT VIDEO</span>
+    <span style="font-size:34px;font-weight:600;line-height:1.2">What if two nodes touch the same field? <b class="mono" style="font-size:30px">Reducers</b> and message state.</span>
+  </div>
+</section>
+</main>
+</div>
+
+<!-- edit-mode affordances (hidden until hovered or E pressed) -->
+<div class="edit-hotzone"></div>
+<button class="edit-toggle" id="editToggle" title="Edit text (E)">✏️</button>
+<div class="deck-controls"><span id="counter">1 / 11</span><div class="progress"><i id="bar"></i></div></div>
+
+<style>
+/* edit mode + print helpers */
+.edit-hotzone{position:fixed;top:0;left:0;width:80px;height:80px;z-index:10000;cursor:pointer}
+.edit-toggle{position:fixed;top:14px;left:14px;opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:10001;font-size:22px;padding:8px 12px;border-radius:12px;border:3px solid #0e1230;background:#ffb703;cursor:pointer}
+.edit-toggle.show,.edit-toggle.active{opacity:1;pointer-events:auto}
+body.editing [contenteditable="true"]{outline:2px dashed #ffb703;outline-offset:4px;cursor:text}
+@media print{.reveal,.grow{opacity:1 !important;transform:none !important;transition:none !important}.meter i{width:var(--w) !important}.edit-hotzone,.edit-toggle{display:none !important}}
+</style>
+<script>
+/* ===========================================
+   DECK ENGINE
+   - scales the fixed 1920x1080 stage to the window
+   - keyboard / swipe / wheel navigation, #hash deep links
+   - draws the scenery (stars, skyline, Wayne Enterprises tower), faces and the floor tracker
+   =========================================== */
+(function(){
+  /* ---------- seeded random so the scenery is the same every time ---------- */
+  function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+
+  /* ---------- faces: <i class="pf" data-who data-ex> ---------- */
+  document.querySelectorAll('.pf').forEach(function(el){
+    var who=el.dataset.who, ex=el.dataset.ex||'neutral';
+    el.innerHTML='<svg viewBox="0 16 200 200" role="img" aria-label="'+who+'"><use href="#'+who+'"/><use href="#ex-'+ex+'"/></svg>';
+  });
+
+  /* ---------- stars ---------- */
+  document.querySelectorAll('.stars').forEach(function(el,k){
+    var r=rng(100+k), n=+el.dataset.n||50, h=+el.dataset.h||500, s='';
+    for(var i=0;i<n;i++){var sz=3+r()*5;s+='<span style="left:'+(r()*1900|0)+'px;top:'+(r()*h|0)+'px;width:'+sz+'px;height:'+sz+'px;animation-delay:'+(r()*3).toFixed(2)+'s"></span>'}
+    el.innerHTML=s;
+  });
+
+  /* ---------- skyline: two layers of buildings with a few lit windows ---------- */
+  document.querySelectorAll('.skyline').forEach(function(el){
+    var r=rng(+el.dataset.seed||1), s='<svg width="1920" height="420" viewBox="0 0 1920 420">';
+    for(var layer=0;layer<2;layer++){
+      var x=-20, col=layer?'#0f1647':'#1a2470', hmax=layer?300:220;
+      while(x<1940){
+        var w=70+r()*90, h=70+r()*hmax;
+        s+='<rect x="'+x.toFixed(0)+'" y="'+(420-h).toFixed(0)+'" width="'+w.toFixed(0)+'" height="'+h.toFixed(0)+'" fill="'+col+'"/>';
+        if(layer){for(var wy=420-h+16;wy<396;wy+=28){for(var wx=x+10;wx<x+w-14;wx+=22){if(r()<.2)s+='<rect x="'+wx.toFixed(0)+'" y="'+wy.toFixed(0)+'" width="9" height="13" fill="#ffd166" opacity="'+(.35+r()*.5).toFixed(2)+'"/>'}}}
+        x+=w+(layer?4:-10);
+      }
+    }
+    s+='<rect x="0" y="402" width="1920" height="18" fill="#070b2c"/></svg>';
+    el.innerHTML=s;
+  });
+
+  /* ---------- the Wayne Enterprises tower ---------- */
+  document.querySelectorAll('.tower').forEach(function(el){
+    var r=rng(+el.dataset.seed||3), hi=el.dataset.hi==='1';
+    function win(x,y,w,h,lit,extra){return '<rect '+(extra||'')+' x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="3" fill="'+(lit?'#ffd166':'#0b1033')+'" opacity="'+(lit?(.5+r()*.5).toFixed(2):1)+'"/>'}
+    var s='<svg viewBox="0 0 560 1000" preserveAspectRatio="xMidYMax meet" style="width:100%;height:100%">';
+    s+='<rect x="272" y="34" width="16" height="108" fill="#2a3270"/><circle class="beacon" cx="280" cy="28" r="10" fill="#ff4d6d"/>';
+    s+='<rect x="205" y="140" width="150" height="126" rx="6" fill="#232c70"/>';
+    s+='<rect x="140" y="262" width="280" height="200" rx="6" fill="#1e2763"/>';
+    s+='<rect x="80" y="458" width="400" height="500" rx="6" fill="#1b2259"/><rect x="396" y="458" width="84" height="500" fill="#121945"/>';
+    s+='<rect x="40" y="950" width="480" height="50" fill="#0c1137"/><rect x="250" y="955" width="60" height="45" fill="#ffd166"/>';
+    for(var j=0;j<2;j++)for(var i=0;i<3;i++)s+=win(222+i*44,166+j*50,24,32,r()<.6);
+    for(var j2=0;j2<3;j2++)for(var i2=0;i2<5;i2++)s+=win(162+i2*50,285+j2*52,26,34,r()<.6);
+    s+='<g class="sign"><rect x="100" y="470" width="360" height="86" rx="10" fill="#0b1033" stroke="#ffb703" stroke-width="5"/>'
+     +'<text x="280" y="512" text-anchor="middle" font-family="Lilita One" font-size="40" letter-spacing="6" fill="#ffd166">WAYNE</text>'
+     +'<text x="280" y="544" text-anchor="middle" font-family="Lilita One" font-size="27" letter-spacing="4" fill="#fff2d1">ENTERPRISES</text></g>';
+    for(var j3=0;j3<7;j3++)for(var i3=0;i3<8;i3++){
+      var isOffice=hi&&i3===7&&j3===3;
+      s+=isOffice?win(104+i3*45,585+j3*52,26,34,true,'class="office" stroke="#fff" stroke-width="3"'):win(104+i3*45,585+j3*52,26,34,r()<.55);
+    }
+    s+='</svg>';
+    el.innerHTML=s;
+  });
+
+  /* ---------- floor tracker (top-right of each episode slide) ---------- */
+  var EPS=[3,4,5,6,7,8,9];
+  document.querySelectorAll('.slide[data-ep]').forEach(function(sl){
+    var ep=+sl.dataset.ep, s='<svg viewBox="0 0 154 48">';
+    EPS.forEach(function(e,i){s+='<rect x="'+(i*22)+'" y="2" width="18" height="18" rx="4" fill="'+(e<=ep?'#ffb703':'currentColor')+'" opacity="'+(e<=ep?1:.2)+'" stroke="#0e1230" stroke-width="2.5"/>'});
+    s+='<text x="0" y="42" font-family="Lilita One" font-size="18" letter-spacing="2" fill="currentColor">FLOOR '+ep+' OF 9</text></svg>';
+    var d=document.createElement('div');d.className='floors';d.innerHTML=s;sl.appendChild(d);
+  });
+
+  /* ---------- presentation controller ---------- */
+  var slides=[].slice.call(document.querySelectorAll('.slide')), stage=document.getElementById('deckStage'),
+      counter=document.getElementById('counter'), bar=document.getElementById('bar'), cur=-1, editing=false, steps=[], cs=0;
+
+  function scale(){
+    var f=Math.min(innerWidth/1920,innerHeight/1080), x=(innerWidth-1920*f)/2, y=(innerHeight-1080*f)/2;
+    stage.style.transform='translate('+x+'px,'+y+'px) scale('+f+')';
+  }
+  function countUp(sl){
+    sl.querySelectorAll('.count').forEach(function(c){
+      var to=+c.dataset.to; c.textContent='0';
+      setTimeout(function(){var t0=Date.now(),iv=setInterval(function(){var p=Math.min((Date.now()-t0)/1400,1);c.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p>=1)clearInterval(iv)},30)},700);
+    });
+  }
+  function show(i,atEnd){
+    i=Math.max(0,Math.min(i,slides.length-1)); if(i===cur)return;
+    slides.forEach(function(s){s.classList.remove('active','visible')});
+    cur=i; cs=atEnd?steps[i]:0; var sl=slides[i]; sl.classList.add('active'); applyStep();
+    requestAnimationFrame(function(){requestAnimationFrame(function(){sl.classList.add('visible');countUp(sl)})});
+    updateBar();
+    try{history.replaceState(null,'','#'+(i+1))}catch(e){}
+  }
+  /* build steps: each .st[data-step=n] shows once the step counter reaches n */
+  steps=slides.map(function(s){var m=0;s.querySelectorAll('.st').forEach(function(e){m=Math.max(m,+e.dataset.step)});return m});
+  function applyStep(){slides[cur].querySelectorAll('.st').forEach(function(e){e.classList.toggle('on',+e.dataset.step<=cs)});updateBar()}
+  function updateBar(){
+    counter.textContent=(cur+1)+' / '+slides.length+(steps[cur]?'  ·  step '+cs+'/'+steps[cur]:'');
+    var done=cur+(steps[cur]?cs/(steps[cur]+1):0); bar.style.width=((done+1)/slides.length*100)+'%';
+  }
+  var next=function(){ if(cs<steps[cur]){cs++;applyStep()} else show(cur+1) };
+  var prev=function(){ if(cs>0){cs--;applyStep()} else show(cur-1,true) };
+
+  /* controls fade in on activity, then hide so recordings stay clean */
+  var ctl=document.querySelector('.deck-controls'), ctlT=null;
+  function pokeCtl(){ctl.classList.add('show');clearTimeout(ctlT);ctlT=setTimeout(function(){ctl.classList.remove('show')},2200)}
+  addEventListener('mousemove',pokeCtl); addEventListener('keydown',pokeCtl);
+  addEventListener('resize',scale); scale();
+  addEventListener('keydown',function(e){
+    if(e.target&&e.target.isContentEditable)return;
+    if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].indexOf(e.key)>-1){e.preventDefault();next()}
+    else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].indexOf(e.key)>-1){e.preventDefault();prev()}
+    else if(e.key==='Home')show(0); else if(e.key==='End')show(slides.length-1);
+  });
+  var wheelLock=false;
+  addEventListener('wheel',function(e){if(wheelLock||editing)return;wheelLock=true;setTimeout(function(){wheelLock=false},650);e.deltaY>0?next():prev()},{passive:true});
+  var tx=null;
+  addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+  addEventListener('touchend',function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50)dx<0?next():prev();tx=null},{passive:true});
+
+  /* ---------- inline text editing (hover top-left corner or press E; Ctrl+S saves a copy) ---------- */
+  var EDITABLE='h1,h2,p,.bubble,.lead,.note,.over,.chip,.nm,.cp,.cc,.step,.step2,.jr span,.ln,.rub span,.tile span,.cg span,.cg b,.panel .disp,.panel .hand';
+  var toggle=document.getElementById('editToggle'), hot=document.querySelector('.edit-hotzone'), hideT=null;
+  function setEdit(on){
+    editing=on; document.body.classList.toggle('editing',on); toggle.classList.toggle('active',on);
+    document.querySelectorAll(EDITABLE).forEach(function(el){if(on)el.setAttribute('contenteditable','true');else el.removeAttribute('contenteditable')});
+  }
+  toggle.addEventListener('click',function(){setEdit(!editing)});
+  hot.addEventListener('click',function(){setEdit(!editing)});
+  hot.addEventListener('mouseenter',function(){clearTimeout(hideT);toggle.classList.add('show')});
+  hot.addEventListener('mouseleave',function(){hideT=setTimeout(function(){if(!editing)toggle.classList.remove('show')},400)});
+  toggle.addEventListener('mouseenter',function(){clearTimeout(hideT)});
+  toggle.addEventListener('mouseleave',function(){hideT=setTimeout(function(){if(!editing)toggle.classList.remove('show')},400)});
+  addEventListener('keydown',function(e){
+    if((e.key==='e'||e.key==='E')&&!(e.target&&e.target.isContentEditable)&&!e.ctrlKey&&!e.metaKey){setEdit(!editing)}
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){
+      e.preventDefault(); var was=editing; setEdit(false);
+      var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+      var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download='video5_slides-edited.html'; a.click();
+      if(was)setEdit(true);
+    }
+  });
+
+  var start=parseInt((location.hash||'').slice(1),10); show(isNaN(start)?0:start-1);
+})();
+</script>
+</body>
+</html>
