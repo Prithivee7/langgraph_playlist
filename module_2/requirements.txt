@@ -1,0 +1,6 @@
+langgraph
+langchain_core
+anthropic
+openai
+google-genai
+python-dotenv
